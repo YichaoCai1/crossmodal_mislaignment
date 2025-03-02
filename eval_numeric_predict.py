@@ -111,8 +111,8 @@ def generate_data(latent_space, h_x, device, num_batches=1, batch_size=4096):
             
             # collect labels and representations
             y1 = complex_nonlinear_function(semantics[:, 0:3])   # [s1, s2, s3] -> y1
-            y2 = complex_nonlinear_function(semantics[:, 0:4])   # [s1, ..., s4] -> y2
-            y3 = complex_nonlinear_function(semantics[:, 0:5])   # [s1, ..., s5] -> y2
+            y2 = complex_nonlinear_function(semantics[:, 0:5])   # [s1, ..., s5] -> y2
+            y3 = complex_nonlinear_function(semantics[:, 0:7])   # [s1, ..., s4] -> y2
             target_lables["y1"].append(y1.unsqueeze(-1).detach().cpu().numpy())
             target_lables["y2"].append(y2.unsqueeze(-1).detach().cpu().numpy())
             target_lables["y3"].append(y3.unsqueeze(-1).detach().cpu().numpy())
