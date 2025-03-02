@@ -10,9 +10,9 @@ import pandas as pd
 import torch
 from scipy.stats import wishart
 from sklearn import kernel_ridge, linear_model
-from sklearn.metrics import r2_score
+from sklearn.metrics import accuracy_score
 from sklearn.model_selection import GridSearchCV
-from sklearn.neural_network import MLPRegressor
+from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
 from torch.nn.utils import clip_grad_norm_
 
@@ -24,7 +24,6 @@ from utils.infinite_iterator import PowersetIndexer
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model-dir", type=str, default="models")
     parser.add_argument("--model-id", type=str, default=None)
     parser.add_argument("--encoding-size", type=int, default=0)         # dimensionality of encoders output, dim(\hat{z})
     parser.add_argument("--semantics-n", type=int, default=10)          # dimensionality of the latent semantic subspace, dim(s)
@@ -94,7 +93,9 @@ def complex_nonlinear_function(z: torch.Tensor) -> torch.Tensor:
         0.4 * log_terms + 0.6 * exp_terms
     )
     
+    
     return f_z
+
 
 
 def generate_data(latent_space, h_x, device, num_batches=1, batch_size=4096):
@@ -112,7 +113,7 @@ def generate_data(latent_space, h_x, device, num_batches=1, batch_size=4096):
             # collect labels and representations
             y1 = complex_nonlinear_function(semantics[:, 0:3])   # [s1, s2, s3] -> y1
             y2 = complex_nonlinear_function(semantics[:, 0:5])   # [s1, ..., s5] -> y2
-            y3 = complex_nonlinear_function(semantics[:, 0:7])   # [s1, ..., s4] -> y2
+            y3 = complex_nonlinear_function(semantics[:, 0:7])   # [s1, ..., s7] -> y3
             target_lables["y1"].append(y1.unsqueeze(-1).detach().cpu().numpy())
             target_lables["y2"].append(y2.unsqueeze(-1).detach().cpu().numpy())
             target_lables["y3"].append(y3.unsqueeze(-1).detach().cpu().numpy())
@@ -124,7 +125,11 @@ def generate_data(latent_space, h_x, device, num_batches=1, batch_size=4096):
     for k, v in data_dict["labels"].items():
         if len(v) > 0:
             v = np.concatenate(v, axis=0)
-        data_dict["labels"][k] = np.array(v)
+            
+        threshold = np.median(v)
+        labels = v > threshold
+        data_dict["labels"][k] = np.array(labels, dtype=np.longlong)
+
     return data_dict
 
 
@@ -147,7 +152,7 @@ def main():
     
     if args.model_id is None:
         setattr(args, "model_id", str(uuid.uuid4()))
-    args.save_dir = os.path.join(args.model_dir, args.model_id)
+    args.save_dir = os.path.join(args.model_id)
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
     
@@ -209,7 +214,7 @@ def main():
     # shifted semantics space
     space_shift_semantics = NRealSpace(n_semantic, selected_indices, perturbed_indices)
     sample_marginal_shifted = lambda space, size, device=device: \
-        space.normal(None, args.margin_param, size, device, Sigma=Sigma_s, shift_ids=[5,6,7,8,9])   # distribution shift occurs in [s_6, ..., s_10]  
+        space.normal(None, args.margin_param, size, device, Sigma=Sigma_s, shift_ids=[7,8,9])   # distribution shift occurs in [s_6, ..., s_10]  
     sample_conditional_shifted = lambda space, z, size, device=device:\
         space.normal(z, args.cond_param, size, device, change_prob=args.change_prob, Sigma=Sigma_a)
     shifted_space_list.append(LatentSpace(
@@ -360,15 +365,15 @@ def main():
             
             
             # nonlinear regression
-            model = MLPRegressor(max_iter=10000)  # lightweight option
-            r2_nonlinear_iid = evaluate_prediction(model, r2_score, *data_iid)
-            r2_nonlinear_ood = evaluate_prediction(model, r2_score, *data_ood)
+            model = MLPClassifier(max_iter=10000)  # lightweight option
+            metric_nonlinear_iid = evaluate_prediction(model, accuracy_score, *data_iid)
+            metric_nonlinear_ood = evaluate_prediction(model, accuracy_score, *data_ood)
             
             # append results
-            results.append((k, r2_nonlinear_iid, r2_nonlinear_ood))
+            results.append((k, metric_nonlinear_iid, metric_nonlinear_ood))
     
     # convert evaluation results into tabular form
-    cols = ["task", "r2_nonlinear_iid", "r2_nonlinear_ood"]
+    cols = ["task", "metric_nonlinear_iid", "metric_nonlinear_ood"]
     df_results = pd.DataFrame(results, columns=cols)
     df_results.to_csv(os.path.join(args.save_dir, "results_predict.csv"))
     print("Downstream Predict results:")
