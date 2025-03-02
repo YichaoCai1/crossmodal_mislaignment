@@ -49,7 +49,6 @@ def parse_args():
     parser.add_argument("--lr", type=float, default=1e-4)
     parser.add_argument("--train-steps", type=int, default=100001)
     parser.add_argument("--log-steps", type=int, default=1000)
-    parser.add_argument("--multi-distribution", action="store_true")    # train the encoders on multiple distribution (distribution shift)
     parser.add_argument("--evaluate", action='store_true')              # to evaluate other than training
     parser.add_argument("--num-eval-batches", type=int, default=5)      
     parser.add_argument("--mlp-eval", action="store_true")
@@ -203,7 +202,6 @@ def main():
     
     # define latent space
     latent_space_list = []
-    shifted_space_list = []
     Sigma_s, Sigma_mx, Sigma_a, Sigma_mt = [None] * 4
     rgen = torch.Generator(device=device)
     rgen.manual_seed(train_seed)        # ensure same latents for train and eval
@@ -223,18 +221,6 @@ def main():
         sample_conditional=sample_conditional_semantics
     ))
     
-    # The shifted distribution -> the last half dimensions endure a mean shift, 0 -> 0.1
-    if args.multi_distribution:
-        space_shift_semantics = NRealSpace(n_semantic, selected_indices, perturbed_indices)
-        sample_marginal_shifted = lambda space, size, device=device: \
-            space.normal(torch.Tensor([0]*(n_semantic//2) + [0.1]*(n_semantic-n_semantic//2))
-                        , args.margin_param, size, device, Sigma=Sigma_s)
-        shifted_space_list.append(LatentSpace(
-            space=space_shift_semantics,
-            sample_marginal=sample_marginal_shifted,
-            sample_conditional=sample_conditional_semantics
-        ))       
-    
     # modality specific spaces
     if n_modality > 0:
         if args.causal_dependence:
@@ -250,12 +236,6 @@ def main():
             sample_marginal=sample_marginal_mx,
             sample_conditional=sample_conditional_mx
         ))
-        if args.multi_distribution:
-            shifted_space_list.append(LatentSpace(
-                space=space_mx,
-                sample_marginal=sample_marginal_mx,
-                sample_conditional=sample_conditional_mx
-            )) 
         
         space_mt = NRealSpace(n_modality)
         sample_marginal_mt = lambda space, size, device=device: \
@@ -266,19 +246,10 @@ def main():
             sample_marginal=sample_marginal_mt,
             sample_conditional=sample_conditional_mt
         ))        
-        if args.multi_distribution:
-            shifted_space_list.append(LatentSpace(
-                space=space_mt,
-                sample_marginal=sample_marginal_mt,
-                sample_conditional=sample_conditional_mt
-            )) 
     
     # combine latents
     latent_space = ProductLatentSpace(spaces=latent_space_list)
     dim_zx, dim_zt, dim_rep = latent_space.dim
-    
-    if args.multi_distribution:
-        shifted_latent_space = ProductLatentSpace(spaces=shifted_space_list)
     
     args.encoding_size = dim_rep if args.encoding_size == 0 else args.encoding_size
     
@@ -366,18 +337,6 @@ def main():
         z_x, z_t, *_ = latent_space.sample_zx_zt(args.batch_size, device)
         z_x_, z_t_, *_ = latent_space.sample_zx_zt(args.batch_size, device)
         data = [z_x, z_t, z_x_, z_t_]
-        
-        if args.multi_distribution:
-            z_x_dist2, z_t_dist2, *_ = shifted_latent_space.sample_zx_zt(args.batch_size, device)
-            z_x_dist2_, z_t_dist2_, *_ = shifted_latent_space.sample_zx_zt(args.batch_size, device)
-            
-            # concat the data of two distributions
-            z_x_dist2 = torch.cat((z_x, z_x_dist2), dim=0)
-            z_t_dist2 = torch.cat((z_t, z_t_dist2), dim=0)
-            z_x_dist2_ = torch.cat((z_x_, z_x_dist2_), dim=0)
-            z_t_dist2_ = torch.cat((z_t_, z_t_dist2_), dim=0)
-            
-            data = [z_x_dist2, z_t_dist2, z_x_dist2_, z_t_dist2_]
             
         train_step(data, h_x, h_t, loss_func, optimizer, params)
 

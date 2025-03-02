@@ -1,10 +1,3 @@
-"""
-Numerical simulation.
-
-This code builds on the following projects with adaptations:
-- https://github.com/imantdaunhawer/multimodal-contrastive-learning
-"""
-
 import argparse
 import json
 import os
@@ -45,23 +38,23 @@ def parse_args():
     parser.add_argument("--n-mixing-layer", type=int, default=3)
     parser.add_argument("--seed", type=int, default=np.random.randint(32**2-1))  
     parser.add_argument("--num-eval-batches", type=int, default=5)  
-    parser.add_argument("--mlp-eval", action="store_true")
     parser.add_argument("--no-cuda", action="store_true")  
     args = parser.parse_args()
 
     return args, parser
 
 
-
-def polynomial_nonlinear_function(z: torch.Tensor) -> torch.Tensor:
+def complex_nonlinear_function(z: torch.Tensor) -> torch.Tensor:
     """
-    A non-linear polynomial function mapping an input tensor z (of any dimension)
+    A highly entangled non-linear polynomial function mapping an input tensor z 
     to a scalar value for regression labeling.
     
     The function includes:
     - Quadratic terms
-    - Interaction terms (pairwise products)
+    - Interaction terms (pairwise, cubic, and quartic)
     - Sinusoidal transformation
+    - Logarithmic transformation
+    - Exponential transformation
     
     Parameters:
     - z: torch.Tensor of shape (n_samples, n_features)
@@ -74,51 +67,64 @@ def polynomial_nonlinear_function(z: torch.Tensor) -> torch.Tensor:
     # Quadratic terms
     quad_terms = torch.sum(z**2, dim=1)
     
+    # Cubic terms
+    cubic_terms = torch.sum(z**3, dim=1)
+    
     # Interaction terms (pairwise products)
     interaction_terms = torch.sum(torch.stack([z[:, i] * z[:, j] for i in range(dim) for j in range(i+1, dim)]), dim=0)
     
-    # Sinusoidal transformation of the first dimension
-    sinusoidal_component = torch.sin(z[:, 0])
+    # Higher-order interactions (triple-wise products)
+    triple_interactions = torch.sum(torch.stack([
+        z[:, i] * z[:, j] * z[:, k] for i in range(dim) for j in range(i+1, dim) for k in range(j+1, dim)
+    ]), dim=0)
+    
+    # Sinusoidal transformation
+    sinusoidal_terms = torch.sum(torch.sin(z), dim=1) + torch.sum(torch.cos(z), dim=1)
+    
+    # Logarithmic transformation
+    log_terms = torch.sum(torch.log1p(torch.abs(z)), dim=1)  # log(1 + |z|)
+    
+    # Exponential transformation
+    exp_terms = torch.sum(torch.exp(-torch.abs(z)), dim=1)  # e^(-|z|)
     
     # Final function combination
-    f_z = quad_terms + 0.5 * interaction_terms + sinusoidal_component
+    f_z = (
+        quad_terms + 0.3 * cubic_terms + 0.5 * interaction_terms + 
+        0.2 * triple_interactions + 0.7 * sinusoidal_terms + 
+        0.4 * log_terms + 0.6 * exp_terms
+    )
     
     return f_z
 
 
-def generate_data(latent_space, h_x, h_t, device, num_batches=1, batch_size=4096):
+def generate_data(latent_space, h_x, device, num_batches=1, batch_size=4096):
     target_lables = {'y1':[], 'y2':[], 'y3':[]}
-    reps_dict = {"hz_x":[], "hz_t":[]}
+    reps = []
     
     with torch.no_grad():
         for _ in range(num_batches):
             
             # sample batch of latents
-            z_x, z_t, semantics, s_theta_tilde, m_x, m_t = latent_space.sample_zx_zt(batch_size, device)
+            z_x, _, semantics, *_ = latent_space.sample_zx_zt(batch_size, device)
             
-            # compute representations
             hz_x = h_x(z_x)
-            hz_t = h_t(z_t)
             
             # collect labels and representations
-            y1 = polynomial_nonlinear_function(semantics[:, 0:3])   # [s1, s2, s3] -> y1
-            y2 = polynomial_nonlinear_function(semantics[:, 0:5])   # [s1, s2, s3, s4, s5] -> y2
-            y3 = polynomial_nonlinear_function(semantics[:, 0:7])   # [s1, s2, s3, s4, s5, s6, s7] -> y3s
+            y1 = complex_nonlinear_function(semantics[:, 0:3])   # [s1, s2, s3] -> y1
+            y2 = complex_nonlinear_function(semantics[:, 0:4])   # [s1, ..., s4] -> y2
+            y3 = complex_nonlinear_function(semantics[:, 0:5])   # [s1, ..., s5] -> y2
             target_lables["y1"].append(y1.unsqueeze(-1).detach().cpu().numpy())
             target_lables["y2"].append(y2.unsqueeze(-1).detach().cpu().numpy())
             target_lables["y3"].append(y3.unsqueeze(-1).detach().cpu().numpy())
             
-            reps_dict["hz_x"].append(hz_x.detach().cpu().numpy())
-            reps_dict["hz_t"].append(hz_t.detach().cpu().numpy())
+            reps.append(hz_x.detach().cpu().numpy())
     
-    data_dict = {"labels":target_lables, "reps":reps_dict}
+    data_dict = {"labels":target_lables, "reps":np.array(np.concatenate(reps, axis=0))}
     
-    for section in data_dict:
-        for k, v in data_dict[section].items():
-            if len(v) > 0:
-                v = np.concatenate(v, axis=0)
-            data_dict[section][k] = np.array(v)
-    
+    for k, v in data_dict["labels"].items():
+        if len(v) > 0:
+            v = np.concatenate(v, axis=0)
+        data_dict["labels"][k] = np.array(v)
     return data_dict
 
 
@@ -201,15 +207,15 @@ def main():
     ))
     
     # shifted semantics space
-    # distribution shift occurs in [s_6, s_7, s_8, s_9, s_10] -> mean shift
     space_shift_semantics = NRealSpace(n_semantic, selected_indices, perturbed_indices)
     sample_marginal_shifted = lambda space, size, device=device: \
-        space.normal(torch.Tensor([0]*(n_semantic//2) + [0.1]*(n_semantic-n_semantic//2))
-                     , args.margin_param, size, device, Sigma=Sigma_s)
+        space.normal(None, args.margin_param, size, device, Sigma=Sigma_s, shift_ids=[5,6,7,8,9])   # distribution shift occurs in [s_6, ..., s_10]  
+    sample_conditional_shifted = lambda space, z, size, device=device:\
+        space.normal(z, args.cond_param, size, device, change_prob=args.change_prob, Sigma=Sigma_a)
     shifted_space_list.append(LatentSpace(
         space=space_shift_semantics,
         sample_marginal=sample_marginal_shifted,
-        sample_conditional=sample_conditional_semantics
+        sample_conditional=sample_conditional_shifted
     ))
     
     # modality specific spaces
@@ -313,54 +319,56 @@ def main():
     f_t.load_state_dict(torch.load(f_t_path, map_location=device))
 
     h_x = lambda z: f_x(g_x(z))
-    h_t = lambda z: f_t(g_t(z))
     
     # generate encoding and labels for the validation and test data
     val_dict = generate_data(
-        latent_space, h_x, h_t, device, 
+        latent_space, h_x, device, 
         num_batches=args.num_eval_batches
     )
     test_iid_dict = generate_data(
-        latent_space, h_x, h_t, device,
+        latent_space, h_x, device,
         num_batches=args.num_eval_batches
     )
     test_ood_dict = generate_data(
-        shifted_space, h_x, h_t, device,
+        shifted_space, h_x, device,
+        num_batches=args.num_eval_batches
+    )
+    temp_dict = generate_data(
+        shifted_space, h_x, device,
         num_batches=args.num_eval_batches
     )
     
-
+    
     # standardize the encodings
-    for m in ['x', 't']:
-        scaler = StandardScaler()
-        val_dict['reps'][f"hz_{m}"] = scaler.fit_transform(val_dict['reps'][f"hz_{m}"])
-        test_iid_dict['reps'][f"hz_{m}"] = scaler.transform(test_iid_dict['reps'][f"hz_{m}"])
-        test_ood_dict['reps'][f"hz_{m}"] = scaler.transform(test_ood_dict['reps'][f"hz_{m}"])
+    scaler = StandardScaler()
+    scaler.fit(np.concatenate((val_dict['reps'],temp_dict['reps']), axis=0))
+    val_dict['reps'] = scaler.transform(val_dict['reps'])
+    test_iid_dict['reps'] = scaler.transform(test_iid_dict['reps'])
+    test_ood_dict['reps'] = scaler.transform(test_ood_dict['reps'])
     
     # train predictors on data from val_dict and evaluate on test_dict
     results = []
-    for m in ['x', 't']:
-        for sec in ['labels']:
-            section_dict = val_dict[sec]
-            for k in section_dict:
-                
-                # select data
-                train_inputs, test_iid_inputs, test_ood_inputs = val_dict['reps'][f"hz_{m}"], test_iid_dict['reps'][f"hz_{m}"], test_ood_dict['reps'][f"hz_{m}"]
-                train_labels, test_iid_labels, test_ood_labels = val_dict[sec][k], test_iid_dict[sec][k], test_ood_dict[sec][k]
-                data_iid = [train_inputs, train_labels, test_iid_inputs, test_iid_labels]
-                data_ood = [train_inputs, train_labels, test_ood_inputs, test_ood_labels]
-                
-                
-                # nonlinear regression
-                model = MLPRegressor(max_iter=10000)  # lightweight option
-                r2_nonlinear_iid = evaluate_prediction(model, r2_score, *data_iid)
-                r2_nonlinear_ood = evaluate_prediction(model, r2_score, *data_ood)
-                
-                # append results
-                results.append((f"hz_{m}", k, r2_nonlinear_iid, r2_nonlinear_ood))
+    for sec in ['labels']:
+        section_dict = val_dict[sec]
+        for k in section_dict:
+            
+            # select data
+            train_inputs, test_iid_inputs, test_ood_inputs = val_dict['reps'], test_iid_dict['reps'], test_ood_dict['reps']
+            train_labels, test_iid_labels, test_ood_labels = val_dict[sec][k], test_iid_dict[sec][k], test_ood_dict[sec][k]
+            data_iid = [train_inputs, train_labels, test_iid_inputs, test_iid_labels]
+            data_ood = [train_inputs, train_labels, test_ood_inputs, test_ood_labels]
+            
+            
+            # nonlinear regression
+            model = MLPRegressor(max_iter=10000)  # lightweight option
+            r2_nonlinear_iid = evaluate_prediction(model, r2_score, *data_iid)
+            r2_nonlinear_ood = evaluate_prediction(model, r2_score, *data_ood)
+            
+            # append results
+            results.append((k, r2_nonlinear_iid, r2_nonlinear_ood))
     
     # convert evaluation results into tabular form
-    cols = ["encoding", "predicted_factors", "r2_nonlinear_iid", "r2_nonlinear_ood"]
+    cols = ["task", "r2_nonlinear_iid", "r2_nonlinear_ood"]
     df_results = pd.DataFrame(results, columns=cols)
     df_results.to_csv(os.path.join(args.save_dir, "results_predict.csv"))
     print("Downstream Predict results:")

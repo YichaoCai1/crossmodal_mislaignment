@@ -80,7 +80,7 @@ class NRealSpace(Space):
     def uniform(self, size, device="cpu"):
         raise NotImplementedError("Not defined on R^n")
 
-    def normal(self, mean, std, size, device="cpu", change_prob=1., Sigma=None):
+    def normal(self, mean, std, size, device="cpu", change_prob=1., Sigma=None, shift_ids=None):
         """Sample from a Normal distribution in R^N.
         Args:
             mean: Value(s) to sample around.
@@ -88,11 +88,13 @@ class NRealSpace(Space):
             size: Number of samples to draw.
             device: torch device identifier
         """
+        
         change_mask = torch.FloatTensor(self.perturb_mask).to(device)
+        
         if mean is None:
             mean = torch.zeros(self.n)
-            change_mask = torch.FloatTensor([1]*self.n).to(device)  # to validate the sample
-            
+            change_mask = torch.FloatTensor([1]*self.n).to(device)  # for marginal sampling
+
         if len(mean.shape) == 1 and mean.shape[0] == self.n:
             mean = mean.unsqueeze(0)
         if not torch.is_tensor(std):
@@ -105,7 +107,7 @@ class NRealSpace(Space):
         if torch.is_tensor(mean):
             mean = mean.to(device)
         if torch.is_tensor(std):
-            std = std.to(device)
+            std = std.to(device)    
         
         # returning bianry output governed by the changing_probability
         change_indices = torch.distributions.binomial.Binomial(probs=change_prob).sample((size, self.n)).to(device)     
@@ -115,7 +117,14 @@ class NRealSpace(Space):
         else:
             changes = torch.randn((size, self.n), device=device) * std      # changing with std = 1
         
-        return mean + change_mask * change_indices * changes
+        # Apply deterministic skewed heavy-tailed transformation to selected indices
+        if shift_ids is not None:
+            for idx in shift_ids:
+                change_indices[...,idx] = 1.
+                change_mask[...,idx] = 1.
+                changes[...,idx] = torch.sign(changes[...,idx]) * (torch.abs(changes[...,idx]) ** 1.5)
+        
+        return mean + change_mask * change_indices * changes  
 
 
 class LatentSpace:
