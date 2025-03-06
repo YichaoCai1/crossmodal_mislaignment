@@ -8,13 +8,12 @@ import warnings
 import numpy as np
 import pandas as pd
 import torch
+import torch.nn as nn
+import torch.optim as optim
 from scipy.stats import wishart
-from sklearn import kernel_ridge, linear_model
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import GridSearchCV
-from sklearn.neural_network import MLPClassifier
+from sklearn.metrics import r2_score, matthews_corrcoef
 from sklearn.preprocessing import StandardScaler
-from torch.nn.utils import clip_grad_norm_
+from sklearn.cluster import KMeans
 
 import encoders
 from utils.invertible_network_utils import construct_invertible_mlp
@@ -43,24 +42,63 @@ def parse_args():
     return args, parser
 
 
+class MLP(nn.Module):
+    def __init__(self, input_dim, output_dim):
+        super(MLP, self).__init__()
+        self.model = nn.Sequential(
+            nn.Linear(input_dim, 100),  # Hidden layer (100 neurons)
+            nn.ReLU(),                  # Activation function
+            nn.Linear(100, output_dim)  # Output layer (Identity activation)
+        )
+        self._initialize_weights()  # Apply Xavier initialization
+
+    def _initialize_weights(self):
+        for m in self.model:
+            if isinstance(m, nn.Linear):
+                nn.init.xavier_uniform_(m.weight)  # Equivalent to Glorot initialization
+                nn.init.zeros_(m.bias)  # Bias set to zero
+
+    def forward(self, x):
+        return self.model(x)  # Linear output for regression
+
+
+def train_mlp_regressor(model, criterion, optimizer, X_train, y_train, device, epochs=100):
+    X_train, y_train = torch.tensor(X_train, dtype=torch.float32).to(device),\
+        torch.tensor(y_train, dtype=torch.float32).to(device)
+    
+    for epoch in range(epochs):
+        model.train()
+        optimizer.zero_grad()
+        outputs = model(X_train)
+        loss = criterion(outputs, y_train)
+        loss.backward()
+        optimizer.step()
+        
+    return model
+
+def train_mlp_classifier(model, optimizer, X_train, y_train, device, epochs=100):
+    # Convert to PyTorch tensors and move to device
+    X_train = torch.tensor(X_train, dtype=torch.float32).to(device)
+    y_train = torch.tensor(y_train, dtype=torch.long).to(device)  # Ensure integer class labels
+    criterion = nn.CrossEntropyLoss()
+
+    for epoch in range(epochs):
+        model.train()
+        optimizer.zero_grad()
+        
+        # Forward pass
+        outputs = model(X_train)  # Output shape: (batch_size, num_classes)
+        
+        # Compute loss
+        loss = criterion(outputs, y_train.squeeze(dim=1))  # CrossEntropyLoss expects logits & integer labels
+        
+        # Backpropagation
+        loss.backward()
+        optimizer.step()
+
+    return model
+
 def complex_nonlinear_function(z: torch.Tensor) -> torch.Tensor:
-    """
-    A highly entangled non-linear polynomial function mapping an input tensor z 
-    to a scalar value for regression labeling.
-    
-    The function includes:
-    - Quadratic terms
-    - Interaction terms (pairwise, cubic, and quartic)
-    - Sinusoidal transformation
-    - Logarithmic transformation
-    - Exponential transformation
-    
-    Parameters:
-    - z: torch.Tensor of shape (n_samples, n_features)
-    
-    Returns:
-    - f_z: torch.Tensor of shape (n_samples,), the computed regression values
-    """
     dim = z.shape[1]
     
     # Quadratic terms
@@ -93,13 +131,26 @@ def complex_nonlinear_function(z: torch.Tensor) -> torch.Tensor:
         0.4 * log_terms + 0.6 * exp_terms
     )
     
-    
     return f_z
 
 
+def gen_class_labels(z: torch.Tensor, device, num_classes: int = 10) -> torch.Tensor:
+    """
+    Generates classification labels based on input features using quantile-based binning.
+    """
+    f_z = complex_nonlinear_function(z).to(device)
+
+    # Compute bins dynamically from data distribution
+    bins = torch.quantile(f_z, torch.linspace(0, 1, num_classes + 1, device=device))
+
+    # Assign labels based on bins
+    labels = torch.bucketize(f_z, bins) - 1  # Ensure range [0, num_classes-1]
+    
+    return torch.clamp(labels, 0, num_classes - 1)
+
 
 def generate_data(latent_space, h_x, device, num_batches=1, batch_size=4096):
-    target_lables = {'y1':[], 'y2':[], 'y3':[]}
+    target_lables = {'y1':[], 'y2':[], 'y3':[], 'y4':[], 'y5':[]}
     reps = []
     
     with torch.no_grad():
@@ -111,12 +162,17 @@ def generate_data(latent_space, h_x, device, num_batches=1, batch_size=4096):
             hz_x = h_x(z_x)
             
             # collect labels and representations
-            y1 = complex_nonlinear_function(semantics[:, 0:3])   # [s1, s2, s3] -> y1
-            y2 = complex_nonlinear_function(semantics[:, 0:5])   # [s1, ..., s5] -> y2
-            y3 = complex_nonlinear_function(semantics[:, 0:7])   # [s1, ..., s7] -> y3
+            y1 = complex_nonlinear_function(semantics[:, 0:3])   
+            y2 = complex_nonlinear_function(semantics[:, 0:5])   
+            y3 = complex_nonlinear_function(semantics[:, 0:7])   
+            y4 = complex_nonlinear_function(semantics[:, 0:9])   
             target_lables["y1"].append(y1.unsqueeze(-1).detach().cpu().numpy())
             target_lables["y2"].append(y2.unsqueeze(-1).detach().cpu().numpy())
             target_lables["y3"].append(y3.unsqueeze(-1).detach().cpu().numpy())
+            target_lables["y4"].append(y4.unsqueeze(-1).detach().cpu().numpy())
+            
+            y5 = gen_class_labels(semantics[:, 0:5], device, num_classes=2)
+            target_lables["y5"].append(y5.unsqueeze(-1).detach().cpu().numpy())
             
             reps.append(hz_x.detach().cpu().numpy())
     
@@ -125,26 +181,10 @@ def generate_data(latent_space, h_x, device, num_batches=1, batch_size=4096):
     for k, v in data_dict["labels"].items():
         if len(v) > 0:
             v = np.concatenate(v, axis=0)
-            
-        threshold = np.median(v)
-        labels = v > threshold
-        data_dict["labels"][k] = np.array(labels, dtype=np.longlong)
+        
+        data_dict["labels"][k] = np.array(v)
 
     return data_dict
-
-
-def evaluate_prediction(model, metric, X_train, y_train, X_test, y_test):
-    # handle edge cases when inputs or labels are zero-dimensional
-    if any([0 in x.shape for x in [X_train, y_train, X_test, y_test]]):
-        return np.nan
-    assert X_train.shape[1] == X_test.shape[1]
-    assert y_train.shape[1] == y_test.shape[1]
-    # handle edge cases when the inputs are one-dimensional
-    if X_train.shape[1] == 1:
-        X_train = X_train.reshape(-1, 1)
-    model.fit(X_train, y_train)
-    y_pred = model.predict(X_test)
-    return metric(y_test, y_pred)
 
 
 def main():
@@ -214,7 +254,7 @@ def main():
     # shifted semantics space
     space_shift_semantics = NRealSpace(n_semantic, selected_indices, perturbed_indices)
     sample_marginal_shifted = lambda space, size, device=device: \
-        space.normal(None, args.margin_param, size, device, Sigma=Sigma_s, shift_ids=[7,8,9])   # distribution shift occurs in [s_6, ..., s_10]  
+        space.normal(None, args.margin_param, size, device, Sigma=Sigma_s, shift_ids=[7, 8, 9])
     sample_conditional_shifted = lambda space, z, size, device=device:\
         space.normal(z, args.cond_param, size, device, change_prob=args.change_prob, Sigma=Sigma_a)
     shifted_space_list.append(LatentSpace(
@@ -330,50 +370,66 @@ def main():
         latent_space, h_x, device, 
         num_batches=args.num_eval_batches
     )
-    test_iid_dict = generate_data(
+    test_dict = generate_data(
         latent_space, h_x, device,
         num_batches=args.num_eval_batches
     )
-    test_ood_dict = generate_data(
+    shifted_dict = generate_data(
         shifted_space, h_x, device,
         num_batches=args.num_eval_batches
     )
-    temp_dict = generate_data(
-        shifted_space, h_x, device,
-        num_batches=args.num_eval_batches
-    )
-    
     
     # standardize the encodings
     scaler = StandardScaler()
-    scaler.fit(np.concatenate((val_dict['reps'],temp_dict['reps']), axis=0))
-    val_dict['reps'] = scaler.transform(val_dict['reps'])
-    test_iid_dict['reps'] = scaler.transform(test_iid_dict['reps'])
-    test_ood_dict['reps'] = scaler.transform(test_ood_dict['reps'])
+    val_dict['reps'] = scaler.fit_transform(val_dict['reps'])
+    test_dict['reps'] = scaler.transform(test_dict['reps'])
+    shifted_dict['reps'] = scaler.transform(shifted_dict['reps'])
     
     # train predictors on data from val_dict and evaluate on test_dict
     results = []
-    for sec in ['labels']:
-        section_dict = val_dict[sec]
-        for k in section_dict:
+    for k in val_dict['labels']:
+        
+        # select data
+        train_inputs, test_inputs = val_dict['reps'], test_dict['reps']
+        train_labels, test_labels = val_dict['labels'][k], test_dict['labels'][k]
+                
+        if k != 'y5':
+            criterion = nn.MSELoss()
+            model = MLP(input_dim=train_inputs.shape[1], output_dim=1).to(device)
+            optimizer = optim.Adam(model.parameters(), lr=0.001)
             
-            # select data
-            train_inputs, test_iid_inputs, test_ood_inputs = val_dict['reps'], test_iid_dict['reps'], test_ood_dict['reps']
-            train_labels, test_iid_labels, test_ood_labels = val_dict[sec][k], test_iid_dict[sec][k], test_ood_dict[sec][k]
-            data_iid = [train_inputs, train_labels, test_iid_inputs, test_iid_labels]
-            data_ood = [train_inputs, train_labels, test_ood_inputs, test_ood_labels]
+            model = train_mlp_regressor(model, criterion, optimizer, train_inputs, train_labels, device, epochs=10000)
             
-            
-            # nonlinear regression
-            model = MLPClassifier(max_iter=10000)  # lightweight option
-            metric_nonlinear_iid = evaluate_prediction(model, accuracy_score, *data_iid)
-            metric_nonlinear_ood = evaluate_prediction(model, accuracy_score, *data_ood)
+            # eval
+            model.eval()
+            with torch.no_grad():
+                y_pred = model(torch.tensor(test_inputs, dtype=torch.float32).to(device)).cpu().numpy()
+                metric_regression = r2_score(test_labels, y_pred)
             
             # append results
-            results.append((k, metric_nonlinear_iid, metric_nonlinear_ood))
+            results.append((k, metric_regression))
+        else:
+            shifted_intputs, shifted_labels = shifted_dict['reps'], shifted_dict['labels'][k]
+            
+            model = MLP(input_dim=train_inputs.shape[1], output_dim=2).to(device)
+            optimizer = optim.Adam(model.parameters(), lr=0.001)
+            
+            model = train_mlp_classifier(model, optimizer, train_inputs, train_labels, device, epochs=10000)
+            
+            model.eval()
+            with torch.no_grad():
+                pred_iid = torch.argmax(model(torch.tensor(test_inputs, dtype=torch.float32).to(device)), dim=1)
+                pred_shifted = torch.argmax(model(torch.tensor(shifted_intputs, dtype=torch.float32).to(device)), dim=1)
+                mcc_iid = matthews_corrcoef(test_labels, pred_iid.cpu().numpy())
+                mcc_shifted = matthews_corrcoef(shifted_labels, pred_shifted.cpu().numpy())
+                
+                df_cls = pd.DataFrame([(mcc_iid, mcc_shifted)], columns=["iid", "ood"])
+                df_cls.to_csv(os.path.join(args.save_dir, "results_classify.csv"))
+                print("Classification results:")
+                print(df_cls.to_string())
     
     # convert evaluation results into tabular form
-    cols = ["task", "metric_nonlinear_iid", "metric_nonlinear_ood"]
+    cols = ["task", "metric_scores"]
     df_results = pd.DataFrame(results, columns=cols)
     df_results.to_csv(os.path.join(args.save_dir, "results_predict.csv"))
     print("Downstream Predict results:")

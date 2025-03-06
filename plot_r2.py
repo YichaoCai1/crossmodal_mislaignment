@@ -5,25 +5,31 @@ import seaborn as sns
 import glob
 import re
 import os
+from decimal import Decimal, ROUND_HALF_UP
 
 # Set font to DejaVu Sans
-plt.rcParams["font.family"] = "DejaVu Sans"
+# plt.rcParams["font.family"] = "DejaVu Sans"
 
 # Load all files matching the pattern
-root_path = "models/2_dep_drop/"
-file_paths = glob.glob(os.path.join(root_path, "dep_drop*_tr*/results.csv"))  # Adjust with actual path
+mode = "drop" 
+# mode = "perturb" 
+stats = "dep"
+# stats = "ind"
+
+root_path = f"models/{stats}_{mode}/"
+file_paths = glob.glob(os.path.join(root_path, f"{stats}_{mode}*_tr*/results.csv"))  # Adjust with actual path
 data_frames = []
 
-# Extract drop configuration and seed number from file names
-pattern = re.compile(r"dep_drop(\d+)_tr(\d+)")  # Extracts drop number and trial number
+# Extract perturb configuration and seed number from file names
+pattern = re.compile(f"{stats}_{mode}"+r"(\d+)_tr(\d+)")  # Extracts perturb number and trial number
 
 for file_path in file_paths:
     match = pattern.search(file_path)
     if match:
-        drop_num = int(match.group(1))  # Extracts drop number
+        mode_num = int(match.group(1))  # Extracts perturb number
         seed_num = int(match.group(2))  # Extracts trial number
         df = pd.read_csv(file_path)
-        df["drop"] = f"drop{drop_num}"  # Create drop identifier
+        df[f"{mode}"] = f"{mode}{mode_num}"  # Create perturb identifier
         df["seed"] = seed_num  # Add seed number
         data_frames.append(df)
 
@@ -31,14 +37,14 @@ for file_path in file_paths:
 df_all = pd.concat(data_frames, ignore_index=True)
 
 # Extract relevant columns
-df_all = df_all[["encoding", "predicted_factors", "r2_linear", "r2_nonlinear", "drop", "seed"]]
+df_all = df_all[["encoding", "predicted_factors", "r2_linear", "r2_nonlinear", f"{mode}", "seed"]]
 
 # Modify the filter to include only specific predicted factors
 included_factors = [f"s_{i}" for i in range(10)] + ["m_x", "m_t"]
 df_all = df_all[df_all["predicted_factors"].isin(included_factors)]
 
 # Pivot to compute mean and std across seeds
-df_pivot = df_all.pivot_table(index=["encoding", "predicted_factors", "drop"], 
+df_pivot = df_all.pivot_table(index=["encoding", "predicted_factors", f"{mode}"], 
                               columns="seed", values=["r2_linear", "r2_nonlinear"])
 
 # Compute mean and standard deviation across seeds
@@ -54,33 +60,33 @@ df_pivot["r2_nonlinear_mean"] = df_pivot["r2_nonlinear_mean"].clip(lower=0)
 # Reset index for processing
 df_pivot = df_pivot.reset_index()
 
-# Define drop configurations and predicted factors
-drop_configs = [f"drop{i}" for i in range(10)]
+# Define perturb configurations and predicted factors
+perturb_configs = [f"{mode}{i}" for i in range(10)]
 # Unicode subscripts
 subscript_map = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
-predicted_factors = [r"$\mathbf{m}_x$", r"$\mathbf{m}_t$"] + [f"s{i}".translate(subscript_map) for i in range(10)]
+predicted_factors = [r"$\mathbf{m}_x$", r"$\mathbf{m}_t$"] + [f"s{i}".translate(subscript_map) for i in range(1,11)]
 
 # Separate data for hz_x and hz_t
-df_hz_x_linear = df_pivot[df_pivot["encoding"] == "hz_x"].pivot(index="predicted_factors", columns="drop", values="r2_linear_mean")
-df_hz_x_nonlinear = df_pivot[df_pivot["encoding"] == "hz_x"].pivot(index="predicted_factors", columns="drop", values="r2_nonlinear_mean")
-df_hz_t_linear = df_pivot[df_pivot["encoding"] == "hz_t"].pivot(index="predicted_factors", columns="drop", values="r2_linear_mean")
-df_hz_t_nonlinear = df_pivot[df_pivot["encoding"] == "hz_t"].pivot(index="predicted_factors", columns="drop", values="r2_nonlinear_mean")
+df_hz_x_linear = df_pivot[df_pivot["encoding"] == "hz_x"].pivot(index="predicted_factors", columns=f"{mode}", values="r2_linear_mean")
+df_hz_x_nonlinear = df_pivot[df_pivot["encoding"] == "hz_x"].pivot(index="predicted_factors", columns=f"{mode}", values="r2_nonlinear_mean")
+df_hz_t_linear = df_pivot[df_pivot["encoding"] == "hz_t"].pivot(index="predicted_factors", columns=f"{mode}", values="r2_linear_mean")
+df_hz_t_nonlinear = df_pivot[df_pivot["encoding"] == "hz_t"].pivot(index="predicted_factors", columns=f"{mode}", values="r2_nonlinear_mean")
 
-df_hz_x_linear_std = df_pivot[df_pivot["encoding"] == "hz_x"].pivot(index="predicted_factors", columns="drop", values="r2_linear_std")
-df_hz_x_nonlinear_std = df_pivot[df_pivot["encoding"] == "hz_x"].pivot(index="predicted_factors", columns="drop", values="r2_nonlinear_std")
-df_hz_t_linear_std = df_pivot[df_pivot["encoding"] == "hz_t"].pivot(index="predicted_factors", columns="drop", values="r2_linear_std")
-df_hz_t_nonlinear_std = df_pivot[df_pivot["encoding"] == "hz_t"].pivot(index="predicted_factors", columns="drop", values="r2_nonlinear_std")
+df_hz_x_linear_std = df_pivot[df_pivot["encoding"] == "hz_x"].pivot(index="predicted_factors", columns=f"{mode}", values="r2_linear_std")
+df_hz_x_nonlinear_std = df_pivot[df_pivot["encoding"] == "hz_x"].pivot(index="predicted_factors", columns=f"{mode}", values="r2_nonlinear_std")
+df_hz_t_linear_std = df_pivot[df_pivot["encoding"] == "hz_t"].pivot(index="predicted_factors", columns=f"{mode}", values="r2_linear_std")
+df_hz_t_nonlinear_std = df_pivot[df_pivot["encoding"] == "hz_t"].pivot(index="predicted_factors", columns=f"{mode}", values="r2_nonlinear_std")
 
 # Ensure column ordering
-df_hz_x_linear = df_hz_x_linear[drop_configs]
-df_hz_x_nonlinear = df_hz_x_nonlinear[drop_configs]
-df_hz_t_linear = df_hz_t_linear[drop_configs]
-df_hz_t_nonlinear = df_hz_t_nonlinear[drop_configs]
+df_hz_x_linear = df_hz_x_linear[perturb_configs]
+df_hz_x_nonlinear = df_hz_x_nonlinear[perturb_configs]
+df_hz_t_linear = df_hz_t_linear[perturb_configs]
+df_hz_t_nonlinear = df_hz_t_nonlinear[perturb_configs]
 
-df_hz_x_linear_std = df_hz_x_linear_std[drop_configs]
-df_hz_x_nonlinear_std = df_hz_x_nonlinear_std[drop_configs]
-df_hz_t_linear_std = df_hz_t_linear_std[drop_configs]
-df_hz_t_nonlinear_std = df_hz_t_nonlinear_std[drop_configs]
+df_hz_x_linear_std = df_hz_x_linear_std[perturb_configs]
+df_hz_x_nonlinear_std = df_hz_x_nonlinear_std[perturb_configs]
+df_hz_t_linear_std = df_hz_t_linear_std[perturb_configs]
+df_hz_t_nonlinear_std = df_hz_t_nonlinear_std[perturb_configs]
 
 
 # Format labels with mean and std (std in smaller font)
@@ -89,8 +95,10 @@ def format_labels(mean_df, std_df):
     for i in range(formatted.shape[0]):
         for j in range(formatted.shape[1]):
             mean_val = mean_df.iloc[i, j]
-            std_val = std_df.iloc[i, j]
-            formatted.iloc[i, j] = f"${{{mean_val:.2f}}}$\n$_{{{std_val:.2f}}}$"
+            # std_val = std_df.iloc[i, j]
+            # formatted.iloc[i, j] = f"${{{mean_val:.2f}}}$\n$_{{{std_val:.2f}}}$"
+            rounded_value = Decimal(mean_val).quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
+            formatted.iloc[i, j] = f"{rounded_value}"
     return formatted
 
 # Generate formatted text labels
@@ -105,20 +113,47 @@ labels_hz_t_nonlinear = format_labels(df_hz_t_nonlinear, df_hz_t_nonlinear_std)
 heatmap_data = [
     (df_hz_x_linear, labels_hz_x_linear, "linear_image_feature.pdf"),
     (df_hz_x_nonlinear, labels_hz_x_nonlinear, "nonlinear_image_feature.pdf"),
-    (df_hz_t_linear, labels_hz_t_linear, "linear_text_features.pdf"),
+    (df_hz_t_linear, labels_hz_t_linear, "linear_text_feature.pdf"),
     (df_hz_t_nonlinear, labels_hz_t_nonlinear, "nonlinear_text_feature.pdf")
 ]
 
+
 for matrix, labels, title in heatmap_data:
-    plt.figure(figsize=(10, 8))
-    sns.heatmap(matrix, annot=labels, fmt="", cmap="BuGn", vmin=0, vmax=1, cbar=True,
-                annot_kws={"fontsize": 12})  # Adjust font size of annotations
-    plt.xlabel("dropation Settings", fontsize=16)
-    plt.ylabel("Predicted Factors (R²)", fontsize=16)
-    plt.xticks(ticks=np.arange(10) + 0.5, labels=["①","②","③","④","⑤","⑥","⑦","⑧","⑨", "⑩"], fontsize=16)
-    plt.yticks(ticks=np.arange(len(predicted_factors)) + 0.5, labels=predicted_factors, fontsize=16, rotation=0)
+    if "image" in title and mode == "drop":
+        plt.figure(figsize=(6.3, 6))
+    else:
+        plt.figure(figsize=(6, 6))
+
+    ax = sns.heatmap(matrix, annot=labels, fmt="", cmap="BuGn", vmin=0, vmax=1, cbar=False,
+                     annot_kws={"fontsize": 18})  # Adjust font size of annotations
+
+    # Set axis labels
+    if mode == "perturb":
+        plt.xlabel(r"$\mathrm{\mathbb{I}}_{\beta}\ |\ \mathrm{\mathbb{I}}_{\theta}=\mathrm{\mathbb{I}}_{\mathbf{s}}$", fontsize=23)
+        plt.xticks(ticks=np.arange(10) + 0.5, labels=reversed([r"${[1:9]}$", r"${[1:8]}$", r"${[1:7]}$", r"${[1:6]}$",
+                                                               r"${[1:5]}$", r"${[1:4]}$", r"${[1:3]}$", r"${[1:2]}$",
+                                                               r"${\{1\}}$", r"${\emptyset}$"]), fontsize=20,
+                   rotation=45)
+    else:
+        plt.xticks(ticks=np.arange(10) + 0.5, labels=[r"${[1:10]}$", r"${[1:9]}$", r"${[1:8]}$", r"${[1:7]}$",
+                                                      r"${[1:6]}$", r"${[1:5]}$", r"${[1:4]}$", r"${[1:3]}$",
+                                                      r"${[1:2]}$", r"${\{1\}}$"], fontsize=20, rotation=45)
+        plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta}$", fontsize=23)
+
+    plt.gca().invert_xaxis()  # Reverse x-axis when dropping semantics
+
+    if "image" in title and mode == "drop":
+        plt.ylabel(r"Predicted factors ($R²$)", fontsize=23)
+    else:
+        plt.ylabel("")
+
+    plt.yticks(ticks=np.arange(len(predicted_factors)) + 0.5, labels=predicted_factors, fontsize=23, rotation=0)
+
+    # Add an overall bounding box
+    ax.add_patch(plt.Rectangle((0, 0), matrix.shape[1], matrix.shape[0],
+                               linewidth=1, edgecolor='#137e6d', facecolor='none', clip_on=False))
 
     # Save figure
+    # plt.show()
     plt.savefig(os.path.join(root_path, title), format="pdf", dpi=600, bbox_inches="tight")
-    plt.show()
     plt.close()  # Close the figure to prevent overlapping plots

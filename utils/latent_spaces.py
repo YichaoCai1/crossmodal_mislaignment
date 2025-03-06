@@ -120,9 +120,15 @@ class NRealSpace(Space):
         # Apply deterministic skewed heavy-tailed transformation to selected indices
         if shift_ids is not None:
             for idx in shift_ids:
-                change_indices[...,idx] = 1.
-                change_mask[...,idx] = 1.
-                changes[...,idx] = torch.sign(changes[...,idx]) * (torch.abs(changes[...,idx]) ** 1.5)
+                change_indices[..., idx] = 1.
+                change_mask[..., idx] = 1.
+
+                # Use a stronger transformation: power-law (exponent 2.0) and scaling
+                changes[..., idx] = torch.sign(changes[..., idx]) * (torch.abs(changes[..., idx]) ** 2.0) * 2.0
+                
+                # Introduce extreme outliers with probability 0.1
+                extreme_outliers = torch.rand(size, device=device) < 0.1
+                changes[extreme_outliers, idx] = torch.sign(changes[extreme_outliers, idx]) * 10.0  # Large spikes
         
         return mean + change_mask * change_indices * changes  
 
