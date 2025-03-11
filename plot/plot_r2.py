@@ -11,12 +11,10 @@ from decimal import Decimal, ROUND_HALF_UP
 # plt.rcParams["font.family"] = "DejaVu Sans"
 
 # Load all files matching the pattern
-mode = "drop" 
-# mode = "perturb" 
-stats = "dep"
-# stats = "ind"
+mode = "drop"   # drop, perturb
+stats = "ind"   # ind, dep
 
-root_path = f"models/{stats}_{mode}/"
+root_path = f"../models/numerical/{stats}_{mode}/"
 file_paths = glob.glob(os.path.join(root_path, f"{stats}_{mode}*_tr*/results.csv"))  # Adjust with actual path
 data_frames = []
 
@@ -129,16 +127,22 @@ for matrix, labels, title in heatmap_data:
 
     # Set axis labels
     if mode == "perturb":
-        plt.xlabel(r"$\mathrm{\mathbb{I}}_{\beta}\ |\ \mathrm{\mathbb{I}}_{\theta}=\mathrm{\mathbb{I}}_{\mathbf{s}}$", fontsize=23)
         plt.xticks(ticks=np.arange(10) + 0.5, labels=reversed([r"${[1:9]}$", r"${[1:8]}$", r"${[1:7]}$", r"${[1:6]}$",
                                                                r"${[1:5]}$", r"${[1:4]}$", r"${[1:3]}$", r"${[1:2]}$",
                                                                r"${\{1\}}$", r"${\emptyset}$"]), fontsize=20,
                    rotation=45)
+        if "image" in title:
+            plt.xlabel(r"$\mathrm{\mathbb{I}}_{\phi},\ \mathrm{\mathbb{I}}_{\theta}=\mathrm{\mathbb{I}}_{\mathbf{s}},\ \hat{\mathbf{z}}_x$", fontsize=23)
+        else:
+            plt.xlabel(r"$\mathrm{\mathbb{I}}_{\phi},\ \mathrm{\mathbb{I}}_{\theta}=\mathrm{\mathbb{I}}_{\mathbf{s}},\ \hat{\mathbf{z}}_t$", fontsize=23)
     else:
         plt.xticks(ticks=np.arange(10) + 0.5, labels=[r"${[1:10]}$", r"${[1:9]}$", r"${[1:8]}$", r"${[1:7]}$",
                                                       r"${[1:6]}$", r"${[1:5]}$", r"${[1:4]}$", r"${[1:3]}$",
                                                       r"${[1:2]}$", r"${\{1\}}$"], fontsize=20, rotation=45)
-        plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta}$", fontsize=23)
+        if "image" in title:
+            plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta},\ \mathrm{\mathbb{I}}_{\phi}=\emptyset,\ \hat{\mathbf{z}}_x$", fontsize=23)
+        else:
+            plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta},\ \mathrm{\mathbb{I}}_{\phi}=\emptyset,\ \hat{\mathbf{z}}_t$", fontsize=23)
 
     plt.gca().invert_xaxis()  # Reverse x-axis when dropping semantics
 
