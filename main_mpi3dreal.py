@@ -33,7 +33,7 @@ def parse_args():
     parser.add_argument("--model-dir", type=str, default="models")
     parser.add_argument("--model-id", type=str, default=None)
     parser.add_argument("--bias-type", type=str, default="selection")
-    parser.add_argument("--bias-id", type=int, default=6)
+    parser.add_argument("--bias-id", type=int, default=4)
     parser.add_argument("--encoding-size", type=int, default=0)
     parser.add_argument("--hidden-size", type=int, default=100)
     parser.add_argument("--tau", type=float, default=1.0)
