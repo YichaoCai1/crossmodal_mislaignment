@@ -271,7 +271,6 @@ def main():
                     torch.save(encoder_txt.state_dict(), os.path.join(args.save_dir, "encoder_txt_%d.pt" % step))
             step += 1
 
-
     # evaluation
     # ----------
     
