@@ -1,0 +1,248 @@
+Tokenization of train data...
+Tokenization of test data...
+/home/ycai/miniconda3/envs/disent-py310/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/home/ycai/miniconda3/envs/disent-py310/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=None`.
+  warnings.warn(msg)
+[OBJ_COLOR] Epoch [1/30], Loss: 0.0695, Accuracy: 0.9740
+[OBJ_COLOR] Epoch [2/30], Loss: 0.0034, Accuracy: 0.9989
+[OBJ_COLOR] Epoch [3/30], Loss: 0.0009, Accuracy: 0.9997
+[OBJ_COLOR] Epoch [4/30], Loss: 0.0007, Accuracy: 0.9998
+[OBJ_COLOR] Epoch [5/30], Loss: 0.0011, Accuracy: 0.9997
+[OBJ_COLOR] Epoch [6/30], Loss: 0.0007, Accuracy: 0.9998
+[OBJ_COLOR] Epoch [7/30], Loss: 0.0003, Accuracy: 0.9999
+[OBJ_COLOR] Epoch [8/30], Loss: 0.0007, Accuracy: 0.9998
+[OBJ_COLOR] Epoch [9/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_COLOR] Epoch [10/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_COLOR] Epoch [11/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_COLOR] Epoch [12/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_COLOR] Epoch [13/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_COLOR] Epoch [14/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_COLOR] Epoch [15/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_COLOR] Epoch [16/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_COLOR] Epoch [17/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_COLOR] Epoch [18/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_COLOR] Epoch [19/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_COLOR] Epoch [20/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_COLOR] Epoch [21/30], Loss: 0.0022, Accuracy: 0.9994
+[OBJ_COLOR] Epoch [22/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_COLOR] Epoch [23/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_COLOR] Epoch [24/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_COLOR] Epoch [25/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_COLOR] Epoch [26/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_COLOR] Epoch [27/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_COLOR] Epoch [28/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_COLOR] Epoch [29/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_COLOR] Epoch [30/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_COLOR] Test Accuracy: 1.0000, MCC: 1.0000
+/home/ycai/miniconda3/envs/disent-py310/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/home/ycai/miniconda3/envs/disent-py310/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=None`.
+  warnings.warn(msg)
+[OBJ_SHAPE] Epoch [1/30], Loss: 0.0778, Accuracy: 0.9705
+[OBJ_SHAPE] Epoch [2/30], Loss: 0.0016, Accuracy: 0.9997
+[OBJ_SHAPE] Epoch [3/30], Loss: 0.0001, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [4/30], Loss: 0.0001, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [5/30], Loss: 0.0042, Accuracy: 0.9986
+[OBJ_SHAPE] Epoch [6/30], Loss: 0.0003, Accuracy: 0.9999
+[OBJ_SHAPE] Epoch [7/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [8/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [9/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [10/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [11/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [12/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [13/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [14/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [15/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [16/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [17/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [18/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [19/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [20/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [21/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [22/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [23/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [24/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [25/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [26/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [27/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [28/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [29/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Epoch [30/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SHAPE] Test Accuracy: 1.0000, MCC: 1.0000
+/home/ycai/miniconda3/envs/disent-py310/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/home/ycai/miniconda3/envs/disent-py310/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=None`.
+  warnings.warn(msg)
+[OBJ_SIZE] Epoch [1/30], Loss: 0.1456, Accuracy: 0.9332
+[OBJ_SIZE] Epoch [2/30], Loss: 0.0263, Accuracy: 0.9900
+[OBJ_SIZE] Epoch [3/30], Loss: 0.0130, Accuracy: 0.9952
+[OBJ_SIZE] Epoch [4/30], Loss: 0.0083, Accuracy: 0.9970
+[OBJ_SIZE] Epoch [5/30], Loss: 0.0081, Accuracy: 0.9971
+[OBJ_SIZE] Epoch [6/30], Loss: 0.0051, Accuracy: 0.9982
+[OBJ_SIZE] Epoch [7/30], Loss: 0.0051, Accuracy: 0.9982
+[OBJ_SIZE] Epoch [8/30], Loss: 0.0039, Accuracy: 0.9986
+[OBJ_SIZE] Epoch [9/30], Loss: 0.0037, Accuracy: 0.9987
+[OBJ_SIZE] Epoch [10/30], Loss: 0.0038, Accuracy: 0.9986
+[OBJ_SIZE] Epoch [11/30], Loss: 0.0018, Accuracy: 0.9994
+[OBJ_SIZE] Epoch [12/30], Loss: 0.0029, Accuracy: 0.9990
+[OBJ_SIZE] Epoch [13/30], Loss: 0.0022, Accuracy: 0.9993
+[OBJ_SIZE] Epoch [14/30], Loss: 0.0027, Accuracy: 0.9991
+[OBJ_SIZE] Epoch [15/30], Loss: 0.0014, Accuracy: 0.9996
+[OBJ_SIZE] Epoch [16/30], Loss: 0.0020, Accuracy: 0.9994
+[OBJ_SIZE] Epoch [17/30], Loss: 0.0021, Accuracy: 0.9993
+[OBJ_SIZE] Epoch [18/30], Loss: 0.0018, Accuracy: 0.9994
+[OBJ_SIZE] Epoch [19/30], Loss: 0.0014, Accuracy: 0.9996
+[OBJ_SIZE] Epoch [20/30], Loss: 0.0015, Accuracy: 0.9995
+[OBJ_SIZE] Epoch [21/30], Loss: 0.0014, Accuracy: 0.9995
+[OBJ_SIZE] Epoch [22/30], Loss: 0.0009, Accuracy: 0.9997
+[OBJ_SIZE] Epoch [23/30], Loss: 0.0014, Accuracy: 0.9995
+[OBJ_SIZE] Epoch [24/30], Loss: 0.0010, Accuracy: 0.9997
+[OBJ_SIZE] Epoch [25/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SIZE] Epoch [26/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SIZE] Epoch [27/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SIZE] Epoch [28/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SIZE] Epoch [29/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SIZE] Epoch [30/30], Loss: 0.0000, Accuracy: 1.0000
+[OBJ_SIZE] Test Accuracy: 1.0000, MCC: 0.9999
+/home/ycai/miniconda3/envs/disent-py310/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/home/ycai/miniconda3/envs/disent-py310/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=None`.
+  warnings.warn(msg)
+[CAMERA] Epoch [1/30], Loss: 0.0070, Accuracy: 0.9973
+[CAMERA] Epoch [2/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [3/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [4/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [5/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [6/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [7/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [8/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [9/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [10/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [11/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [12/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [13/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [14/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [15/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [16/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [17/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [18/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [19/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [20/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [21/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [22/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [23/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [24/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [25/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [26/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [27/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [28/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [29/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Epoch [30/30], Loss: 0.0000, Accuracy: 1.0000
+[CAMERA] Test Accuracy: 1.0000, MCC: 1.0000
+/home/ycai/miniconda3/envs/disent-py310/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/home/ycai/miniconda3/envs/disent-py310/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=None`.
+  warnings.warn(msg)
+[BACKGROUND] Epoch [1/30], Loss: 0.0126, Accuracy: 0.9963
+[BACKGROUND] Epoch [2/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [3/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [4/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [5/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [6/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [7/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [8/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [9/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [10/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [11/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [12/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [13/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [14/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [15/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [16/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [17/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [18/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [19/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [20/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [21/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [22/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [23/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [24/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [25/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [26/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [27/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [28/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [29/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Epoch [30/30], Loss: 0.0000, Accuracy: 1.0000
+[BACKGROUND] Test Accuracy: 1.0000, MCC: 1.0000
+/home/ycai/miniconda3/envs/disent-py310/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/home/ycai/miniconda3/envs/disent-py310/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=None`.
+  warnings.warn(msg)
+[H_AXIS] Epoch [1/30], Loss: 0.9301, Accuracy: 0.7252
+[H_AXIS] Epoch [2/30], Loss: 0.1260, Accuracy: 0.9604
+[H_AXIS] Epoch [3/30], Loss: 0.0577, Accuracy: 0.9825
+[H_AXIS] Epoch [4/30], Loss: 0.0483, Accuracy: 0.9840
+[H_AXIS] Epoch [5/30], Loss: 0.0376, Accuracy: 0.9878
+[H_AXIS] Epoch [6/30], Loss: 0.0297, Accuracy: 0.9906
+[H_AXIS] Epoch [7/30], Loss: 0.0285, Accuracy: 0.9903
+[H_AXIS] Epoch [8/30], Loss: 0.0223, Accuracy: 0.9926
+[H_AXIS] Epoch [9/30], Loss: 0.0218, Accuracy: 0.9929
+[H_AXIS] Epoch [10/30], Loss: 0.0207, Accuracy: 0.9932
+[H_AXIS] Epoch [11/30], Loss: 0.0092, Accuracy: 0.9974
+[H_AXIS] Epoch [12/30], Loss: 0.0190, Accuracy: 0.9942
+[H_AXIS] Epoch [13/30], Loss: 0.0133, Accuracy: 0.9958
+[H_AXIS] Epoch [14/30], Loss: 0.0106, Accuracy: 0.9968
+[H_AXIS] Epoch [15/30], Loss: 0.0187, Accuracy: 0.9939
+[H_AXIS] Epoch [16/30], Loss: 0.0127, Accuracy: 0.9961
+[H_AXIS] Epoch [17/30], Loss: 0.0200, Accuracy: 0.9936
+[H_AXIS] Epoch [18/30], Loss: 0.0058, Accuracy: 0.9984
+[H_AXIS] Epoch [19/30], Loss: 0.0140, Accuracy: 0.9953
+[H_AXIS] Epoch [20/30], Loss: 0.0020, Accuracy: 0.9995
+[H_AXIS] Epoch [21/30], Loss: 0.0125, Accuracy: 0.9960
+[H_AXIS] Epoch [22/30], Loss: 0.0106, Accuracy: 0.9968
+[H_AXIS] Epoch [23/30], Loss: 0.0129, Accuracy: 0.9958
+[H_AXIS] Epoch [24/30], Loss: 0.0096, Accuracy: 0.9971
+[H_AXIS] Epoch [25/30], Loss: 0.0013, Accuracy: 0.9998
+[H_AXIS] Epoch [26/30], Loss: 0.0139, Accuracy: 0.9955
+[H_AXIS] Epoch [27/30], Loss: 0.0120, Accuracy: 0.9962
+[H_AXIS] Epoch [28/30], Loss: 0.0019, Accuracy: 0.9996
+[H_AXIS] Epoch [29/30], Loss: 0.0128, Accuracy: 0.9960
+[H_AXIS] Epoch [30/30], Loss: 0.0097, Accuracy: 0.9971
+[H_AXIS] Test Accuracy: 0.9996, MCC: 0.9996
+/home/ycai/miniconda3/envs/disent-py310/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/home/ycai/miniconda3/envs/disent-py310/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=None`.
+  warnings.warn(msg)
+[V_AXIS] Epoch [1/30], Loss: 0.8881, Accuracy: 0.7287
+[V_AXIS] Epoch [2/30], Loss: 0.1291, Accuracy: 0.9639
+[V_AXIS] Epoch [3/30], Loss: 0.0592, Accuracy: 0.9834
+[V_AXIS] Epoch [4/30], Loss: 0.0403, Accuracy: 0.9878
+[V_AXIS] Epoch [5/30], Loss: 0.0374, Accuracy: 0.9882
+[V_AXIS] Epoch [6/30], Loss: 0.0206, Accuracy: 0.9938
+[V_AXIS] Epoch [7/30], Loss: 0.0271, Accuracy: 0.9915
+[V_AXIS] Epoch [8/30], Loss: 0.0219, Accuracy: 0.9930
+[V_AXIS] Epoch [9/30], Loss: 0.0179, Accuracy: 0.9943
+[V_AXIS] Epoch [10/30], Loss: 0.0234, Accuracy: 0.9922
+[V_AXIS] Epoch [11/30], Loss: 0.0122, Accuracy: 0.9962
+[V_AXIS] Epoch [12/30], Loss: 0.0184, Accuracy: 0.9942
+[V_AXIS] Epoch [13/30], Loss: 0.0184, Accuracy: 0.9941
+[V_AXIS] Epoch [14/30], Loss: 0.0126, Accuracy: 0.9959
+[V_AXIS] Epoch [15/30], Loss: 0.0155, Accuracy: 0.9950
+[V_AXIS] Epoch [16/30], Loss: 0.0124, Accuracy: 0.9959
+[V_AXIS] Epoch [17/30], Loss: 0.0079, Accuracy: 0.9975
+[V_AXIS] Epoch [18/30], Loss: 0.0149, Accuracy: 0.9951
+[V_AXIS] Epoch [19/30], Loss: 0.0142, Accuracy: 0.9955
+[V_AXIS] Epoch [20/30], Loss: 0.0093, Accuracy: 0.9971
+[V_AXIS] Epoch [21/30], Loss: 0.0107, Accuracy: 0.9965
+[V_AXIS] Epoch [22/30], Loss: 0.0107, Accuracy: 0.9966
+[V_AXIS] Epoch [23/30], Loss: 0.0098, Accuracy: 0.9968
+[V_AXIS] Epoch [24/30], Loss: 0.0057, Accuracy: 0.9984
+[V_AXIS] Epoch [25/30], Loss: 0.0141, Accuracy: 0.9953
+[V_AXIS] Epoch [26/30], Loss: 0.0077, Accuracy: 0.9977
+[V_AXIS] Epoch [27/30], Loss: 0.0076, Accuracy: 0.9976
+[V_AXIS] Epoch [28/30], Loss: 0.0084, Accuracy: 0.9973
+[V_AXIS] Epoch [29/30], Loss: 0.0112, Accuracy: 0.9965
+[V_AXIS] Epoch [30/30], Loss: 0.0061, Accuracy: 0.9981
+[V_AXIS] Test Accuracy: 0.9961, MCC: 0.9960
+Training and evaluation completed. Results saved to supervised_results.csv

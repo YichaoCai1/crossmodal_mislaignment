@@ -6,7 +6,7 @@ import re
 import os
 
 # Load all result_predict.csv files from the specified directory pattern
-mode = "perturb"  # or "perturb", drop
+mode = "drop"  # or "perturb", drop
 stats = "dep"  # or "ind", dep
 root_path = f"../models/numerical/{stats}_{mode}/"
 file_paths = glob.glob(os.path.join(root_path, f"{stats}_{mode}*_tr*/results_predict.csv"))
@@ -73,7 +73,7 @@ if data_frames:
                          alpha=0.2)
 
     # Formatting the plot
-    plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta},\ \mathrm{\mathbb{I}}_{\phi}=\emptyset$" if mode == "drop" else r"$\mathrm{\mathbb{I}}_{\phi},\ \mathrm{\mathbb{I}}_{\theta}=\mathrm{\mathbb{I}}_{\mathbf{s}}$", fontsize=20)
+    plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta},\ \mathrm{\mathbb{I}}_{\rho}=\emptyset$" if mode == "drop" else r"$\mathrm{\mathbb{I}}_{\rho},\ \mathrm{\mathbb{I}}_{\theta}=\mathrm{\mathbb{I}}_{\mathbf{s}}$", fontsize=20)
     if stats == "ind":
         plt.ylabel(r"$R^2$", fontsize=20)
     plt.xticks(ticks=np.arange(10), labels=x_labels, fontsize=16, rotation=45)
@@ -88,7 +88,7 @@ if data_frames:
     else:
         plt.title(r"Regression, Dependent", fontsize=20)
     plt.savefig(os.path.join(root_path, "predict_recog.pdf"), format="pdf", dpi=600, bbox_inches="tight")
-    plt.show()
+    # plt.show()
     plt.close()
 
 else:

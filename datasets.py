@@ -271,9 +271,7 @@ class MultimodalMPI3DRealComplex(torch.utils.data.Dataset):
         ['OBJ_COLOR', "OBJ_SHAPE"],
         ["OBJ_COLOR", "OBJ_SHAPE", "OBJ_SIZE"],
         ["OBJ_COLOR", "OBJ_SHAPE", "OBJ_SIZE", "CAMERA"],
-        ["OBJ_COLOR", "OBJ_SHAPE", "OBJ_SIZE", "CAMERA", "BACKGROUND"],
-        ["OBJ_COLOR", "OBJ_SHAPE", "OBJ_SIZE", "CAMERA", "BACKGROUND", "H_AXIS"],
-        ["OBJ_COLOR", "OBJ_SHAPE", "OBJ_SIZE", "CAMERA", "BACKGROUND", "H_AXIS", "V_AXIS"]
+        ["OBJ_COLOR", "OBJ_SHAPE", "OBJ_SIZE", "CAMERA", "BACKGROUND"]
     ]   # For simplicity, we only consider a increasing order of selection here.
     
     PERTURBATION_BIAS = [
@@ -281,12 +279,10 @@ class MultimodalMPI3DRealComplex(torch.utils.data.Dataset):
         ['OBJ_COLOR'],
         ['OBJ_COLOR', "OBJ_SHAPE"],
         ["OBJ_COLOR", "OBJ_SHAPE", "OBJ_SIZE"],
-        ["OBJ_COLOR", "OBJ_SHAPE", "OBJ_SIZE", "CAMERA"],
-        ["OBJ_COLOR", "OBJ_SHAPE", "OBJ_SIZE", "CAMERA", "BACKGROUND"],
-        ["OBJ_COLOR", "OBJ_SHAPE", "OBJ_SIZE", "CAMERA", "BACKGROUND", "H_AXIS"]
+        ["OBJ_COLOR", "OBJ_SHAPE", "OBJ_SIZE", "CAMERA"]
     ]
     
-    def __init__(self, data_dir, bias_type="selection", bias_id=6, mode="train", transform=None, vocab_filepath=None):
+    def __init__(self, data_dir, bias_type="selection", bias_id=4, mode="train", transform=None, vocab_filepath=None):
         self.bias_type = bias_type
         self.bias_id = bias_id
         
@@ -466,6 +462,6 @@ class MultimodalMPI3DRealComplex(torch.utils.data.Dataset):
 
 
 if __name__ == "__main__":
-    dataset = MultimodalMPI3DRealComplex("./data/MPI3d_real_complex", bias_type="selection", bias_id=6, mode="train")
+    dataset = MultimodalMPI3DRealComplex("./data/MPI3d_real_complex", bias_type="selection", bias_id=4, mode="train")
     print(dataset[1000]["image"].shape, dataset[1000]["text"].shape, dataset[1000]["semantics"])
     print(dataset[1000]["image"].shape, dataset[10000]["text"].shape, dataset[1000]["semantics"])

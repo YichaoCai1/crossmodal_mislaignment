@@ -10,9 +10,9 @@ from datasets import MultimodalMPI3DRealComplex
 
 
 # Hyperparameters
-learning_rate = 1e-5
-batch_size = 256
-train_epochs = 50
+learning_rate = 1e-4
+batch_size = 1024
+train_epochs = 30
 checkpoint_epochs = 10
 datapath = "./data/MPI3d_real_complex"
 save_dir = "./models/MPI3d_supervise"

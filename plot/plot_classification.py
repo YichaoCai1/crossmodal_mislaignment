@@ -4,7 +4,7 @@ import pandas as pd
 import os
 
 # Define mode and setting variables
-mode = "perturb"  # or "perturb", drop
+mode = "drop"  # or "perturb", drop
 setting = "ind"  # or "ind", dep
 
 base_dir = os.path.join("../models/numerical/", f"{setting}_{mode}")
@@ -55,9 +55,9 @@ plt.fill_between(range(len(x_labels)), ood_mins, ood_maxs, color='red', alpha=0.
 
 # Formatting the plot
 if mode == "drop":
-    plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta},\ \mathrm{\mathbb{I}}_{\phi}=\emptyset$", fontsize=20)
+    plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta},\ \mathrm{\mathbb{I}}_{\rho}=\emptyset$", fontsize=20)
 else:
-    plt.xlabel(r"$\mathrm{\mathbb{I}}_{\phi},\ \mathrm{\mathbb{I}}_{\theta}=\mathrm{\mathbb{I}}_{\mathbf{s}}$", fontsize=20)
+    plt.xlabel(r"$\mathrm{\mathbb{I}}_{\rho},\ \mathrm{\mathbb{I}}_{\theta}=\mathrm{\mathbb{I}}_{\mathbf{s}}$", fontsize=20)
 
 # Reverse x-axis
 plt.gca().invert_xaxis()
@@ -74,5 +74,5 @@ else:
     plt.title(r"Classification, Dependent", fontsize=20)
 
 plt.savefig(os.path.join(base_dir, "predict_class.pdf"), format="pdf", dpi=600, bbox_inches="tight")
-plt.show()
+# plt.show()
 plt.close()

@@ -195,6 +195,7 @@ def main():
     
     if args.encoding_size == 0:
         args.encoding_size = len(train_dataset.unbiased_semantics)
+        assert args.encoding_size >= 1
     
     # print args
     print("Arguments:")
