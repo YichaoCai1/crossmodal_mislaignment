@@ -282,6 +282,8 @@ class MultimodalMPI3DRealComplex(torch.utils.data.Dataset):
         ["OBJ_COLOR", "OBJ_SHAPE", "OBJ_SIZE", "CAMERA"]
     ]
     
+    VAL_LATENTS=["OBJ_COLOR", "OBJ_SHAPE", "OBJ_SIZE", "CAMERA", "BACKGROUND", "H_AXIS", "V_AXIS"]
+    
     def __init__(self, data_dir, bias_type="selection", bias_id=4, mode="train", transform=None, vocab_filepath=None):
         self.bias_type = bias_type
         self.bias_id = bias_id
@@ -361,7 +363,7 @@ class MultimodalMPI3DRealComplex(torch.utils.data.Dataset):
         s_text = pd.read_csv(self.latents_text_filepath)
 
         # check if all factors are present
-        for v in self.SELECTION_BIAS[-1]:
+        for v in self.VAL_LATENTS:
             assert v in s_image.keys()
         for v in self.selected_semantics:
             assert v in s_text.keys()

@@ -83,7 +83,7 @@ def val_step(data, f1, f2, loss_func):
 def get_data(dataset, f1, f2, loss_func, dataloader_kwargs):
     loader = DataLoader(dataset, **dataloader_kwargs)
     iterator = InfiniteIterator(loader)
-    labels_image = {v: [] for v in MultimodalMPI3DRealComplex.SELECTION_BIAS[-1]}
+    labels_image = {v: [] for v in MultimodalMPI3DRealComplex.VAL_LATENTS}
     rdict = {"hz_image": [], "hz_text": [], "loss_values": [],
              "semantics": labels_image}
     i = 0
@@ -185,12 +185,12 @@ def main():
 
     # define dataloaders
     train_dataset = MultimodalMPI3DRealComplex(args.datapath, bias_type=args.bias_type, bias_id=args.bias_id, mode="train", **dataset_kwargs)
-    vocab_filepath = train_dataset.vocab_filepath
+    # vocab_filepath = train_dataset.vocab_filepath
     train_loader = DataLoader(train_dataset, **dataloader_kwargs)
     train_iterator = InfiniteIterator(train_loader)
     
     test_dataset = MultimodalMPI3DRealComplex(args.datapath, bias_type=args.bias_type, bias_id=args.bias_id, mode="test",
-                                        vocab_filepath=vocab_filepath,
+                                        vocab_filepath=None,
                                         **dataset_kwargs)
     
     if args.encoding_size == 0:
@@ -296,7 +296,7 @@ def main():
 
     # evaluate how well each factor can be predicted from the encodings
     results = []
-    semantics = MultimodalMPI3DRealComplex.SELECTION_BIAS[-1]     # full semantics
+    semantics = MultimodalMPI3DRealComplex.VAL_LATENTS     # full visual latents
     for m in ["image", "text"]:
         for ix, semantic_name in enumerate(semantics):
 
