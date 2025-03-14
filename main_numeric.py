@@ -48,7 +48,7 @@ def parse_args():
     parser.add_argument("--batch-size", type=int, default=6144)
     parser.add_argument("--lr", type=float, default=1e-4)
     parser.add_argument("--train-steps", type=int, default=100001)
-    parser.add_argument("--log-steps", type=int, default=1000)
+    parser.add_argument("--log-steps", type=int, default=50000)
     parser.add_argument("--evaluate", action='store_true')              # to evaluate other than training
     parser.add_argument("--num-eval-batches", type=int, default=5)      
     parser.add_argument("--mlp-eval", action="store_true")
