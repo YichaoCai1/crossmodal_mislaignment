@@ -437,7 +437,7 @@ class MultimodalMPI3DRealComplex(torch.utils.data.Dataset):
         
         # load image from latents
         img_latents = self.labels["s_image"].iloc[idx].tolist()
-
+        
         img = self.data[tuple(img_latents)]     # advanced indexing -> (64, 64, 3)
         image = torch.from_numpy(img).float() / 255.0
         image = image.permute(2,0,1)    # (H, W, C) -> (C, H, W)

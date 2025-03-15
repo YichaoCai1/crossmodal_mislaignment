@@ -22,7 +22,7 @@ from torchvision import transforms
 from torchvision.models import resnet18
 
 from datasets import MultimodalMPI3DRealComplex
-from encoders import FlexibleTextEncoder2D, TransformerTextEncoder
+from encoders import FlexibleTextEncoder2D
 from utils.infinite_iterator import InfiniteIterator
 from utils.losses import infonce_loss
 
@@ -305,6 +305,7 @@ def main():
             test_inputs = test_dict[f"hz_{m}"]
             train_labels = val_dict[f"semantics"][semantic_name]
             test_labels = test_dict[f"semantics"][semantic_name]
+
             data = [train_inputs, train_labels, test_inputs, test_labels]
             mcc_logreg, mcc_mlp = [np.nan] * 2
 
