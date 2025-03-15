@@ -59,13 +59,13 @@ perturb_configs = sorted(df_grouped[f"{mode}"].unique(), key=lambda x: int(x.spl
 
 # Generate LaTeX-compatible semantic names
 factor_name_map = {
-    "OBJ_COLOR": r"$\mathbf{Color}$",
-    "OBJ_SHAPE": r"$\mathbf{Shape}$",
-    "OBJ_SIZE": r"$\mathbf{Size}$",
-    "CAMERA": r"$\mathbf{Camera}$",
-    "BACKGROUND": r"$\mathbf{Background}$",
-    "H_AXIS": r"$\mathbf{H\ Axis}$",
-    "V_AXIS": r"$\mathbf{V\ Axis}$"
+    "OBJ_COLOR": r"$\mathbf{\ color}$",
+    "OBJ_SHAPE": r"$\mathbf{\ shape}$",
+    "OBJ_SIZE":  r"$\mathbf{\ size}$",
+    "CAMERA":    r"$\mathbf{\ cam.}$",
+    "BACKGROUND": r"$\mathbf{\ back.}$",
+    "H_AXIS": r"$\mathbf{\ hori.}$",
+    "V_AXIS": r"$\mathbf{\ vert.}$"
 }
 semantic_name = [factor_name_map[factor] for factor in fixed_factor_order]
 
@@ -117,22 +117,25 @@ heatmap_data = [
 ]
 
 for matrix, labels, title in heatmap_data:
-    plt.figure(figsize=(6, 6))
+    plt.figure(figsize=(5, 4))
 
     ax = sns.heatmap(matrix, annot=labels, fmt="", cmap="BuGn", vmin=None, vmax=None, cbar=False,
                      annot_kws={"fontsize": 18})
 
     # Set x-axis labels with circled numbers
-    plt.xticks(ticks=np.arange(len(perturb_configs)) + 0.5, labels=circled_numbers, fontsize=20)
+    plt.xticks(ticks=np.arange(len(perturb_configs)) + 0.5, labels=circled_numbers, fontsize=20, rotation=0)
 
     if "image" in title:
-        plt.xlabel(r"$\hat{\mathbf{z}}_x$", fontsize=23)
+        plt.xlabel(f"{mode} biases"+r", $\hat{\mathbf{z}}_x$", fontsize=20)
     else:
-        plt.xlabel(r"$\hat{\mathbf{z}}_t$", fontsize=23)
+        plt.xlabel(f"{mode} biases"+r", $\hat{\mathbf{z}}_t$", fontsize=20)
 
     # Set y-axis labels
-    plt.ylabel("Predicted factors ($MCC$)", fontsize=23)
-    plt.yticks(ticks=np.arange(len(semantic_name)) + 0.5, labels=semantic_name, fontsize=23, rotation=0)
+    if mode == "selection" and "image" in title:
+        plt.ylabel("Predicted factors ($MCC$)", fontsize=20)
+    else:
+        plt.ylabel("")
+    plt.yticks(ticks=np.arange(len(semantic_name)) + 0.5, labels=semantic_name, fontsize=20, rotation=0)
 
     # Save figure
     plt.savefig(os.path.join(root_path, title), format="pdf", dpi=600, bbox_inches="tight")
