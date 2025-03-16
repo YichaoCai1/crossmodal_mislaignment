@@ -117,13 +117,17 @@ heatmap_data = [
 ]
 
 for matrix, labels, title in heatmap_data:
-    plt.figure(figsize=(5, 4))
+    plt.figure(figsize=(5, 3))
 
     ax = sns.heatmap(matrix, annot=labels, fmt="", cmap="BuGn", vmin=None, vmax=None, cbar=False,
                      annot_kws={"fontsize": 18})
 
+    
     # Set x-axis labels with circled numbers
     plt.xticks(ticks=np.arange(len(perturb_configs)) + 0.5, labels=circled_numbers, fontsize=20, rotation=0)
+    
+    if mode == "perturbation":
+        plt.gca().invert_xaxis()  # Reverse x-axis when dropping semantics
 
     if "image" in title:
         plt.xlabel(f"{mode} biases"+r", $\hat{\mathbf{z}}_x$", fontsize=20)
@@ -132,10 +136,14 @@ for matrix, labels, title in heatmap_data:
 
     # Set y-axis labels
     if mode == "selection" and "image" in title:
-        plt.ylabel("Predicted factors ($MCC$)", fontsize=20)
+        plt.ylabel("MCC Scores", fontsize=20)
     else:
         plt.ylabel("")
     plt.yticks(ticks=np.arange(len(semantic_name)) + 0.5, labels=semantic_name, fontsize=20, rotation=0)
+
+        # Add an overall bounding box
+    ax.add_patch(plt.Rectangle((0, 0), matrix.shape[1], matrix.shape[0],
+                               linewidth=1, edgecolor='#137e6d', facecolor='none', clip_on=False))
 
     # Save figure
     plt.savefig(os.path.join(root_path, title), format="pdf", dpi=600, bbox_inches="tight")
