@@ -34,8 +34,8 @@ class Multimodal3DIdent(torch.utils.data.Dataset):
     FACTORS = {
         "image": {
             0: "object_shape",
-            1: "object_ypos",
-            2: "object_xpos",
+            1: "object_xpos",
+            2: "object_ypos",
             # 3: "object_zpos",  # is constant
             4: "object_alpharot",
             5: "object_betarot",
@@ -47,32 +47,48 @@ class Multimodal3DIdent(torch.utils.data.Dataset):
         },
         "text": {
             0: "object_shape",
-            1: "object_ypos",
-            2: "object_xpos",
-            # 3: "object_zpos",  # is constant
+            1: "object_xpos",
+            2: "object_ypos",
+            3: "spotlight_pos",
             4: "object_color_index",
-            5: "text_phrasing"
+            5: "splotlight_color_index",
+            6: "background_color_index",
+            7: "text_phrasing"
         }
     }
+    
+    SELECTIONS = [
+        ["object_shape", "text_phrasing"],
+        ["object_shape", "object_xpos", "text_phrasing"],
+        ["object_shape", "object_xpos", "object_ypos", "text_phrasing"],
+        ["object_shape", "object_xpos", "object_ypos", "spotlight_pos", "text_phrasing"],
+        ["object_shape", "object_xpos", "object_ypos", "spotlight_pos", "object_color_index",
+            "text_phrasing"],
+        ["object_shape", "object_xpos", "object_ypos", "spotlight_pos", "object_color_index", 
+            "splotlight_color_index", "text_phrasing"],
+        ["object_shape", "object_xpos", "object_ypos", "spotlight_pos", "object_color_index", 
+            "splotlight_color_index", "background_color_index", "text_phrasing"],
+    ]
 
     DISCRETE_FACTORS = {
         "image": {
             0: "object_shape",
-            1: "object_ypos",
-            2: "object_xpos",
+            1: "object_xpos",
+            2: "object_ypos",
             # 3: "object_zpos",  # is constant
         },
         "text": {
             0: "object_shape",
-            1: "object_ypos",
-            2: "object_xpos",
-            # 3: "object_zpos",  # is constant
+            1: "object_xpos",
+            2: "object_ypos",
             4: "object_color_index",
-            5: "text_phrasing"
+            5: "splotlight_color_index",
+            6: "background_color_index",
+            7: "text_phrasing"
         }
     }
 
-    def __init__(self, data_dir, mode="train", transform=None,
+    def __init__(self, data_dir, bias_type="selections", bias_id=6,  mode="train", transform=None,
             has_labels=True, vocab_filepath=None):
         """
         Args:
@@ -83,18 +99,24 @@ class Multimodal3DIdent(torch.utils.data.Dataset):
             vocab_filepath (str): Optional path to a saved vocabulary. If None,
               the vocabulary will be (re-)created.
         """
+        self.bias_type = bias_type
+        self.bias_id = bias_id
+        if bias_type != "selections":
+            self.selected_semantics = self.SELECTIONS[-1]
+        else:
+            self.selected_semantics = self.SELECTIONS[bias_id]
+        
         self.mode = mode
         self.transform = transform
         self.has_labels = has_labels
         self.data_dir = data_dir
-        self.data_dir_mode = os.path.join(data_dir, mode)
         self.latents_text_filepath = \
-            os.path.join(self.data_dir_mode, "latents_text.csv")
+            os.path.join(self.data_dir, f"latents_text_{self.bias_type}_{self.bias_id}.csv")
         self.latents_image_filepath = \
-            os.path.join(self.data_dir_mode, "latents_image.csv")
+            os.path.join(self.data_dir, "latents_image.csv")
         self.text_filepath = \
-            os.path.join(self.data_dir_mode, "text", "text_raw.txt")
-        self.image_dir = os.path.join(self.data_dir_mode, "images")
+            os.path.join(self.data_dir, "text", f"{self.bias_type}_{self.bias_id}", "text_raw.txt")
+        self.image_dir = os.path.join(self.data_dir, "images")
 
         # load text
         text_in_sentences, text_in_words = self._load_text()
@@ -112,7 +134,7 @@ class Multimodal3DIdent(torch.utils.data.Dataset):
         if vocab_filepath:
             self.vocab_filepath = vocab_filepath
         else:
-            self.vocab_filepath = os.path.join(self.data_dir, "vocab.json")
+            self.vocab_filepath = os.path.join(self.data_dir, f"vocab_{self.bias_type}_{self.bias_id}.json")
 
         # optionally, load ground-truth labels
         if has_labels:
@@ -158,7 +180,7 @@ class Multimodal3DIdent(torch.utils.data.Dataset):
         # check if all factors are present
         for v in self.FACTORS["image"].values():
             assert v in s_image.keys()
-        for v in self.FACTORS["text"].values():
+        for v in self.selected_semantics:
             assert v in s_text.keys()
 
         # create label dict
@@ -209,8 +231,12 @@ class Multimodal3DIdent(torch.utils.data.Dataset):
             with open(vocab_filepath, "r") as vocab_file:
                 vocab = json.load(vocab_file)
         else:
-            new_filepath = os.path.join(self.data_dir, "vocab.json")
-            vocab = self._create_vocab(vocab_filepath=new_filepath)
+            new_filepath = os.path.join(self.data_dir, f"vocab_{self.bias_type}_{self.bias_id}.json")
+            if os.path.exists(new_filepath):
+                with open(new_filepath, "r") as vocab_file:
+                    vocab = json.load(vocab_file)
+            else:
+                vocab = self._create_vocab(vocab_filepath=new_filepath)
         return (vocab["w2i"], vocab["i2w"])
 
     def __getitem__(self, idx):
@@ -308,13 +334,13 @@ class MultimodalMPI3DRealComplex(torch.utils.data.Dataset):
         self.mode = mode
         self.transform = transform
         self.data_dir = data_dir
-        self.data_dir_mode = os.path.join(data_dir, mode)
+        self.data_dir = os.path.join(data_dir, mode)
         self.latents_text_filepath = \
-            os.path.join(self.data_dir_mode, f"text_semantics_{self.bias_type}_{self.bias_id}.csv")
+            os.path.join(self.data_dir, f"text_semantics_{self.bias_type}_{self.bias_id}.csv")
         self.latents_image_filepath = \
-            os.path.join(self.data_dir_mode, f"image_semantics.csv")
+            os.path.join(self.data_dir, f"image_semantics.csv")
         self.text_filepath = \
-            os.path.join(self.data_dir_mode, f"text_{self.bias_type}_{self.bias_id}.txt")
+            os.path.join(self.data_dir, f"text_{self.bias_type}_{self.bias_id}.txt")
         
         mpi3d = \
             np.load(os.path.join(self.data_dir, "real3d_complicated_shapes_ordered.npz"))['images']
