@@ -274,12 +274,20 @@ class MultimodalMPI3DRealComplex(torch.utils.data.Dataset):
         ["OBJ_COLOR", "OBJ_SHAPE", "OBJ_SIZE", "CAMERA", "BACKGROUND"]
     ]   # For simplicity, we only consider a increasing order of selection here.
     
+    # PERTURBATION_BIAS = [
+    #     [],
+    #     ['OBJ_COLOR'],
+    #     ['OBJ_COLOR', "OBJ_SHAPE"],
+    #     ["OBJ_COLOR", "OBJ_SHAPE", "OBJ_SIZE"],
+    #     ["OBJ_COLOR", "OBJ_SHAPE", "OBJ_SIZE", "CAMERA"]
+    # ]
+    
     PERTURBATION_BIAS = [
         [],
-        ['OBJ_COLOR'],
-        ['OBJ_COLOR', "OBJ_SHAPE"],
-        ["OBJ_COLOR", "OBJ_SHAPE", "OBJ_SIZE"],
-        ["OBJ_COLOR", "OBJ_SHAPE", "OBJ_SIZE", "CAMERA"]
+        ['BACKGROUND'],
+        ['CAMERA', "BACKGROUND"],
+        ["OBJ_SIZE", "CAMERA", "BACKGROUND"],
+        ["OBJ_SHAPE", "OBJ_SIZE", "CAMERA", "BACKGROUND"],
     ]
     
     VAL_LATENTS=["OBJ_COLOR", "OBJ_SHAPE", "OBJ_SIZE", "CAMERA", "BACKGROUND", "H_AXIS", "V_AXIS"]

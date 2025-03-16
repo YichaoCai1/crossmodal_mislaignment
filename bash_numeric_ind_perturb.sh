@@ -1,25 +1,5 @@
 echo "run numerical simulaton..."
 
-CUDA_VISIBLE_DEVICES=3 python main_numeric.py --model-id "Numeric/ind_perturb1_tr1" --beta-value 0 --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=3 python main_numeric.py --model-id "Numeric/ind_perturb1_tr2" --beta-value 0 --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=3 python main_numeric.py --model-id "Numeric/ind_perturb1_tr3" --beta-value 0 --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=3 python main_numeric.py --model-id "Numeric/ind_perturb2_tr1" --beta-value 10 --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=3 python main_numeric.py --model-id "Numeric/ind_perturb2_tr2" --beta-value 10 --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=3 python main_numeric.py --model-id "Numeric/ind_perturb2_tr3" --beta-value 10 --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=3 python main_numeric.py --model-id "Numeric/ind_perturb3_tr1" --beta-value 55 --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=3 python main_numeric.py --model-id "Numeric/ind_perturb3_tr2" --beta-value 55 --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=3 python main_numeric.py --model-id "Numeric/ind_perturb3_tr3" --beta-value 55 --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=3 python main_numeric.py --model-id "Numeric/ind_perturb4_tr1" --beta-value 175 --mlp-eval
-wait
 CUDA_VISIBLE_DEVICES=3 python main_numeric.py --model-id "Numeric/ind_perturb4_tr2" --beta-value 175 --mlp-eval
 wait
 CUDA_VISIBLE_DEVICES=3 python main_numeric.py --model-id "Numeric/ind_perturb4_tr3" --beta-value 175 --mlp-eval

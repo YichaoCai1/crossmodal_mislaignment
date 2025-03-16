@@ -48,7 +48,7 @@ def parse_args():
     parser.add_argument("--batch-size", type=int, default=6144)
     parser.add_argument("--lr", type=float, default=1e-4)
     parser.add_argument("--train-steps", type=int, default=100001)
-    parser.add_argument("--log-steps", type=int, default=1000)
+    parser.add_argument("--log-steps", type=int, default=10000)
     parser.add_argument("--evaluate", action='store_true')              # to evaluate other than training
     parser.add_argument("--num-eval-batches", type=int, default=5)      
     parser.add_argument("--mlp-eval", action="store_true")
@@ -92,48 +92,45 @@ def generate_data(latent_space, h_x, h_t, device, num_batches=1, batch_size=4096
     n_s = latent_space.semantics_n
     perturbed_idx = latent_space.perturb_indices
     inv_idx = latent_space.inv_indices
-    semantic_dict = {k:[] for k in [f's_{i}' for i in range(n_s)]}
+
+    semantic_dict = {f's_{i}': [] for i in range(n_s)}
     semantic_dict["s_inv"] = []
-    perturbed_dict = {k:[] for k in [f'tilde_s_{i}' for i in perturbed_idx]}
-    non_semantic_dict = {"m_x":[], "m_t":[]}
-    reps_dict = {"hz_x":[], "hz_t":[], "loss_values":[]}
-    
+    perturbed_dict = {f'tilde_s_{i}': [] for i in perturbed_idx}
+    non_semantic_dict = {"m_x": [], "m_t": []}
+    reps_dict = {"hz_x": [], "hz_t": [], "loss_values": []}
+
     with torch.no_grad():
         for _ in range(num_batches):
-            
-            # sample batch of latents
             z_x, z_t, semantics, s_theta_tilde, m_x, m_t = latent_space.sample_zx_zt(batch_size, device)
-            
-            # compute representations
-            hz_x = h_x(z_x)
-            hz_t = h_t(z_t)
-            
+
+            hz_x = h_x(z_x).cpu().numpy()
+            hz_t = h_t(z_t).cpu().numpy()
+
             if loss_func is not None:
                 z_x_, z_t_, *_ = latent_space.sample_zx_zt(batch_size, device)
-                data = [z_x, z_t, z_x_, z_t_]
-                loss_value = val_step(data, h_x, h_t, loss_func)
+                loss_value = val_step([z_x, z_t, z_x_, z_t_], h_x, h_t, loss_func)
                 reps_dict["loss_values"].append([loss_value])
-            
-            # collect labels and representations
+
+            semantics_np = semantics.cpu().numpy()
             for i in range(n_s):
-                semantic_dict[f's_{i}'].append(semantics[:,i].unsqueeze(-1).detach().cpu().numpy())    
-            semantic_dict['s_inv'].append(semantics[:,inv_idx].detach().cpu().numpy())    
-            
+                semantic_dict[f's_{i}'].append(semantics_np[:, i:i+1])
+            semantic_dict['s_inv'].append(semantics_np[:, inv_idx])
+
             for i in perturbed_idx:
-                perturbed_dict[f'tilde_s_{i}'].append(s_theta_tilde[:,i].unsqueeze(-1).detach().cpu().numpy())
-            non_semantic_dict["m_x"].append(m_x.detach().cpu().numpy())
-            non_semantic_dict["m_t"].append(m_t.detach().cpu().numpy())
-            reps_dict["hz_x"].append(hz_x.detach().cpu().numpy())
-            reps_dict["hz_t"].append(hz_t.detach().cpu().numpy())
-    
-    data_dict = {"s":semantic_dict, "perturbed_s":perturbed_dict, "m":non_semantic_dict, "reps":reps_dict}
-    
-    for section in data_dict:
-        for k, v in data_dict[section].items():
-            if len(v) > 0:
-                v = np.concatenate(v, axis=0)
-            data_dict[section][k] = np.array(v)
-    
+                perturbed_dict[f'tilde_s_{i}'].append(s_theta_tilde[:, i:i+1].cpu().numpy())
+
+            non_semantic_dict["m_x"].append(m_x.cpu().numpy())
+            non_semantic_dict["m_t"].append(m_t.cpu().numpy())
+
+            reps_dict["hz_x"].append(hz_x)
+            reps_dict["hz_t"].append(hz_t)
+
+    data_dict = {"s": semantic_dict, "perturbed_s": perturbed_dict, "m": non_semantic_dict, "reps": reps_dict}
+
+    for section_dict in data_dict.values():
+        for key in section_dict:
+            section_dict[key] = np.concatenate(section_dict[key], axis=0)
+
     return data_dict
 
 

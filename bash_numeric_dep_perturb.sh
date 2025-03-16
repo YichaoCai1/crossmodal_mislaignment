@@ -1,17 +1,5 @@
 echo "run numerical simulaton..."
 
-CUDA_VISIBLE_DEVICES=2 python main_numeric.py --model-id "Numeric/dep_perturb1_tr1" --beta-value 0 --causal-dependence --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=2 python main_numeric.py --model-id "Numeric/dep_perturb1_tr2" --beta-value 0 --causal-dependence --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=2 python main_numeric.py --model-id "Numeric/dep_perturb1_tr3" --beta-value 0 --causal-dependence --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=2 python main_numeric.py --model-id "Numeric/dep_perturb2_tr1" --beta-value 10 --causal-dependence --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=2 python main_numeric.py --model-id "Numeric/dep_perturb2_tr2" --beta-value 10 --causal-dependence --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=2 python main_numeric.py --model-id "Numeric/dep_perturb2_tr3" --beta-value 10 --causal-dependence --mlp-eval
-wait
 CUDA_VISIBLE_DEVICES=2 python main_numeric.py --model-id "Numeric/dep_perturb3_tr1" --beta-value 55 --causal-dependence --mlp-eval
 wait
 CUDA_VISIBLE_DEVICES=2 python main_numeric.py --model-id "Numeric/dep_perturb3_tr2" --beta-value 55 --causal-dependence --mlp-eval

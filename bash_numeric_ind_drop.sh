@@ -1,29 +1,5 @@
 echo "run numerical simulaton..."
 
-CUDA_VISIBLE_DEVICES=1 python main_numeric.py --model-id "Numeric/ind_drop9_tr1" --theta-value 0 --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=1 python main_numeric.py --model-id "Numeric/ind_drop9_tr2" --theta-value 0 --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=1 python main_numeric.py --model-id "Numeric/ind_drop9_tr3" --theta-value 0 --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=1 python main_numeric.py --model-id "Numeric/ind_drop8_tr1" --theta-value 10 --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=1 python main_numeric.py --model-id "Numeric/ind_drop8_tr2" --theta-value 10 --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=1 python main_numeric.py --model-id "Numeric/ind_drop8_tr3" --theta-value 10 --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=1 python main_numeric.py --model-id "Numeric/ind_drop7_tr1" --theta-value 55 --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=1 python main_numeric.py --model-id "Numeric/ind_drop7_tr2" --theta-value 55 --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=1 python main_numeric.py --model-id "Numeric/ind_drop7_tr3" --theta-value 55 --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=1 python main_numeric.py --model-id "Numeric/ind_drop6_tr1" --theta-value 175 --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=1 python main_numeric.py --model-id "Numeric/ind_drop6_tr2" --theta-value 175 --mlp-eval
-wait
-CUDA_VISIBLE_DEVICES=1 python main_numeric.py --model-id "Numeric/ind_drop6_tr3" --theta-value 175 --mlp-eval
-wait
 CUDA_VISIBLE_DEVICES=1 python main_numeric.py --model-id "Numeric/ind_drop5_tr1" --theta-value 385 --mlp-eval
 wait
 CUDA_VISIBLE_DEVICES=1 python main_numeric.py --model-id "Numeric/ind_drop5_tr2" --theta-value 385 --mlp-eval
