@@ -8,7 +8,7 @@ import os
 from decimal import Decimal, ROUND_HALF_UP
 
 # Define mode: "selection" or "perturbation"
-mode = "selection"  # Change to "selection" if needed
+mode = "perturbation"  # Change to "selection" if needed
 
 # Define root directory
 root_path = f"../models/MPI3d/"
@@ -136,10 +136,12 @@ for matrix, labels, title in heatmap_data:
 
     # Set y-axis labels
     if mode == "selection" and "image" in title:
-        plt.ylabel("MCC Scores", fontsize=20)
+        plt.ylabel("MCC", fontsize=20)
+        plt.yticks(ticks=np.arange(len(semantic_name)) + 0.5, labels=semantic_name, fontsize=20, rotation=0)
+        
     else:
         plt.ylabel("")
-    plt.yticks(ticks=np.arange(len(semantic_name)) + 0.5, labels=semantic_name, fontsize=20, rotation=0)
+        plt.yticks([])  # Hide y-axis tick
 
         # Add an overall bounding box
     ax.add_patch(plt.Rectangle((0, 0), matrix.shape[1], matrix.shape[0],
