@@ -334,13 +334,13 @@ class MultimodalMPI3DRealComplex(torch.utils.data.Dataset):
         self.mode = mode
         self.transform = transform
         self.data_dir = data_dir
-        self.data_dir = os.path.join(data_dir, mode)
+        self.data_dir_mode = os.path.join(data_dir, mode)
         self.latents_text_filepath = \
-            os.path.join(self.data_dir, f"text_semantics_{self.bias_type}_{self.bias_id}.csv")
+            os.path.join(self.data_dir_mode, f"text_semantics_{self.bias_type}_{self.bias_id}.csv")
         self.latents_image_filepath = \
-            os.path.join(self.data_dir, f"image_semantics.csv")
+            os.path.join(self.data_dir_mode, f"image_semantics.csv")
         self.text_filepath = \
-            os.path.join(self.data_dir, f"text_{self.bias_type}_{self.bias_id}.txt")
+            os.path.join(self.data_dir_mode, f"text_{self.bias_type}_{self.bias_id}.txt")
         
         mpi3d = \
             np.load(os.path.join(self.data_dir, "real3d_complicated_shapes_ordered.npz"))['images']
@@ -498,6 +498,23 @@ class MultimodalMPI3DRealComplex(torch.utils.data.Dataset):
 
 
 if __name__ == "__main__":
+    import matplotlib.pyplot as plt
+    from torchvision.utils import make_grid
+    
     dataset = MultimodalMPI3DRealComplex("./data/MPI3d_real_complex", bias_type="selection", bias_id=4, mode="train")
-    print(dataset[1000]["image"].shape, dataset[1000]["text"].shape, dataset[1000]["semantics"])
-    print(dataset[1000]["image"].shape, dataset[10000]["text"].shape, dataset[1000]["semantics"])
+    # Select 10 random indices
+    indices = np.random.choice(len(dataset), 20, replace=False)
+
+    # Retrieve images
+    images = [dataset[i]["image"] for i in indices]
+
+    # Create a grid of images in one row
+    image_grid = make_grid(images, nrow=10, padding=2, normalize=True)
+
+    # Plot images
+    plt.figure(figsize=(20, 5))
+    plt.imshow(image_grid.permute(1, 2, 0))  # Convert (C, H, W) to (H, W, C)
+    plt.axis("off")
+    plt.savefig("mpi_sample.pdf", format="pdf", dpi=600, bbox_inches="tight")
+    plt.title("10 Random Images from MultimodalMPI3DRealComplex Dataset")
+    plt.show()
