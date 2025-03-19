@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BASE_DIR="models/dep_perturb"
+BASE_DIR="models/Numeric/ind_perturb"
 
 # Loop through only directories inside BASE_DIR
 for MODEL_ID in $(ls -d "$BASE_DIR"/*/ 2>/dev/null); do

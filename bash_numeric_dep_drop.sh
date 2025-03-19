@@ -1,5 +1,7 @@
 echo "run numerical simulaton..."
 
+CUDA_VISIBLE_DEVICES=0 python main_numeric.py --model-id "Numeric/dep_drop8_tr1" --theta-value 10 --causal-dependence --mlp-eval
+
 CUDA_VISIBLE_DEVICES=0 python main_numeric.py --model-id "Numeric/dep_drop7_tr3" --theta-value 55 --causal-dependence --mlp-eval
 wait
 CUDA_VISIBLE_DEVICES=0 python main_numeric.py --model-id "Numeric/dep_drop6_tr1" --theta-value 175 --causal-dependence --mlp-eval

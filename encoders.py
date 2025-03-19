@@ -161,7 +161,6 @@ class FlexibleTextEncoder2D(nn.Module):
         x = self.linear(x)
         return x
 
-
 # Validation code to ensure correctness
 def validate_encoder():
     input_size = 64

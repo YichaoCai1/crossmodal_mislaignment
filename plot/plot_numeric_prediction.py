@@ -8,7 +8,7 @@ import os
 # Load all result_predict.csv files from the specified directory pattern
 mode = "drop"  # or "perturb", drop
 stats = "dep"  # or "ind", dep
-root_path = f"../models/numerical/{stats}_{mode}/"
+root_path = f"../models/Numeric/{stats}_{mode}/"
 file_paths = glob.glob(os.path.join(root_path, f"{stats}_{mode}*_tr*/results_predict.csv"))
 data_frames = []
 
@@ -43,11 +43,11 @@ if data_frames:
     mode_configs = sorted(df_grouped[mode].unique(), key=lambda x: int(x.replace(mode, "")))  # Sort mode configs
     
     if mode == "drop":
-        x_labels = [r"${[1:10]}$", r"${[1:9]}$", r"${[1:8]}$", r"${[1:7]}$", r"${[1:6]}$",
-                    r"${[1:5]}$", r"${[1:4]}$", r"${[1:3]}$", r"${[1:2]}$", r"${\{1\}}$"]
+        x_labels = [r"${[10]}$", r"${[9]}$", r"${[8]}$", r"${[7]}$", r"${[6]}$",
+                    r"${[5]}$", r"${[4]}$", r"${[3]}$", r"${[2]}$", r"${\{1\}}$"]
     else:
-        x_labels = list(reversed([r"${[1:9]}$", r"${[1:8]}$", r"${[1:7]}$", r"${[1:6]}$",
-                                  r"${[1:5]}$", r"${[1:4]}$", r"${[1:3]}$", r"${[1:2]}$", r"${\{1\}}$", r"${\emptyset}$"]))
+        x_labels = list(reversed([r"${[9]}$", r"${[8]}$", r"${[7]}$", r"${[6]}$",
+                                  r"${[5]}$", r"${[4]}$", r"${[3]}$", r"${[2]}$", r"${\{1\}}$", r"${\emptyset}$"]))
 
     legend_labels = {
         "y1": r"$y_1$",
@@ -57,33 +57,51 @@ if data_frames:
     }
     
     # Plot Performance
-    plt.figure(figsize=(5.2, 4) if stats == "ind" else (5, 4))
+    plt.figure(figsize=(5.2, 3.5)) # if stats == "ind" else (5, 4))
     
-    for task in df_grouped["task"].unique():
+    # Define the x positions where vertical lines should be drawn
+    x_positions = [7, 5, 3, 1]
+    
+    task_colors = {}  # Dictionary to store assigned colors per task
+
+    for task_idx, task in enumerate(df_grouped["task"].unique()):
         task_data = df_grouped[df_grouped["task"] == task]
-        x_positions = [int(d.replace(mode, "")) for d in task_data[mode]]  # Convert mode names to numerical indices
+        x_values = [int(d.replace(mode, "")) for d in task_data[mode]]  # Convert mode names to numerical indices
         
+        # Assign unique color to each task
+        color = f"C{task_idx}"  # Matplotlib color cycle
+        task_colors[task] = color
+
         # Plot mean curve
-        plt.plot(x_positions, task_data["mean_metric"], label=legend_labels.get(task, task), marker="o", linestyle="-")
+        plt.plot(x_values, task_data["mean_metric"], label=legend_labels.get(task, task), marker="o", linestyle="-", color=color)
         
         # Fill area between min and max values
-        plt.fill_between(x_positions,
+        plt.fill_between(x_values,
                          task_data["min_metric"],
                          task_data["max_metric"],
-                         alpha=0.2)
+                         alpha=0.2,
+                         color=color)
+
+    # Draw vertical dashed lines only if mode == "drop"
+    if mode == "drop":
+        for idx, x in enumerate(x_positions):
+            if idx < len(df_grouped["task"].unique()):  # Ensure index is within available tasks
+                task = list(df_grouped["task"].unique())[idx]
+                color = task_colors.get(task, "black")  # Get assigned color, default to black
+                plt.axvline(x, color=color, linestyle="dashed", linewidth=1, alpha=0.3)
 
     # Formatting the plot
     plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta},\ \mathrm{\mathbb{I}}_{\rho}=\emptyset$" if mode == "drop" else r"$\mathrm{\mathbb{I}}_{\rho},\ \mathrm{\mathbb{I}}_{\theta}=\mathrm{\mathbb{I}}_{\mathbf{s}}$", fontsize=20)
     if stats == "ind":
         plt.ylabel(r"$R^2$", fontsize=20)
-    plt.xticks(ticks=np.arange(10), labels=x_labels, fontsize=16, rotation=45)
+    plt.xticks(ticks=np.arange(10), labels=x_labels, fontsize=16, rotation=0)
     plt.yticks(fontsize=16)
     
     # Reverse x-axis
     plt.gca().invert_xaxis()
+    plt.legend(fontsize=10)
 
     if stats == "ind":
-        plt.legend(fontsize=20)
         plt.title(r"Regression, Independent", fontsize=20)
     else:
         plt.title(r"Regression, Dependent", fontsize=20)

@@ -5,17 +5,17 @@ import os
 
 # Define mode and setting variables
 mode = "drop"  # or "perturb", drop
-setting = "ind"  # or "ind", dep
+setting = "dep"  # or "ind", dep
 
-base_dir = os.path.join("../models/numerical/", f"{setting}_{mode}")
+base_dir = os.path.join("../models/Numeric/", f"{setting}_{mode}")
 
 # Define x-axis labels based on mode
 if mode == "drop":
-    x_labels = [r"${[1:10]}$", r"${[1:9]}$", r"${[1:8]}$", r"${[1:7]}$", r"${[1:6]}$",
-                r"${[1:5]}$", r"${[1:4]}$", r"${[1:3]}$", r"${[1:2]}$", r"${\{1\}}$"]
+    x_labels = [r"${[10]}$", r"${[9]}$", r"${[8]}$", r"${[7]}$", r"${[6]}$",
+                r"${[5]}$", r"${[4]}$", r"${[3]}$", r"${[2]}$", r"${\{1\}}$"]
 else:
-    x_labels = list(reversed([r"${[1:9]}$", r"${[1:8]}$", r"${[1:7]}$", r"${[1:6]}$",
-                              r"${[1:5]}$", r"${[1:4]}$", r"${[1:3]}$", r"${[1:2]}$", r"${\{1\}}$", r"${\emptyset}$"]))
+    x_labels = list(reversed([r"${[9]}$", r"${[8]}$", r"${[7]}$", r"${[6]}$",
+                                r"${[5]}$", r"${[4]}$", r"${[3]}$", r"${[2]}$", r"${\{1\}}$", r"${\emptyset}$"]))
 
 # Initialize lists to store results
 id_means, id_mins, id_maxs = [], [], []
@@ -43,7 +43,7 @@ for bias in range(10):  # Assuming 10 drop settings (0-9)
     ood_maxs.append(np.max(ood_vals) if ood_vals else np.nan)
 
 # Plot ID and OOD MCC curves with shaded regions for min-max bounds
-plt.figure(figsize=(5.2, 4) if setting == "ind" else (5, 4))
+plt.figure(figsize=(5.2, 3.5)) # if setting == "ind" else (5, 4))
 
 # Plot ID MCC with shaded region (bounded by min-max)
 plt.plot(range(len(x_labels)), id_means, '-o', label="ID", color='orange')

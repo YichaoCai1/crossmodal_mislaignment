@@ -11,10 +11,10 @@ from decimal import Decimal, ROUND_HALF_UP
 # plt.rcParams["font.family"] = "DejaVu Sans"
 
 # Load all files matching the pattern
-mode = "perturb"   # drop, perturb
+mode = "drop"   # drop, perturb
 stats = "ind"   # ind, dep
 
-root_path = f"../models/numerical/{stats}_{mode}/"
+root_path = f"../models/Numeric/{stats}_{mode}/"
 file_paths = glob.glob(os.path.join(root_path, f"{stats}_{mode}*_tr*/results.csv"))  # Adjust with actual path
 data_frames = []
 
@@ -118,50 +118,54 @@ heatmap_data = [
 
 for matrix, labels, title in heatmap_data:
     if "image" in title and mode == "drop":
-        plt.figure(figsize=(6.3, 6))
+        plt.figure(figsize=(6.5, 5))
     else:
-        plt.figure(figsize=(6, 6))
+        plt.figure(figsize=(6.5, 5))
 
-    ax = sns.heatmap(matrix, annot=labels, fmt="", cmap="BuGn", vmin=0, vmax=1, cbar=False,
-                     annot_kws={"fontsize": 18})  # Adjust font size of annotations
+    ax = sns.heatmap(matrix, annot=labels, fmt="", cmap=sns.color_palette("BuGn", as_cmap=True), vmin=0, vmax=1, cbar=False,
+                     annot_kws={"fontsize": 17})  # Adjust font size of annotations
 
+    
     # Set axis labels
     if mode == "perturb":
-        plt.xticks(ticks=np.arange(10) + 0.5, labels=reversed([r"${[1:9]}$", r"${[1:8]}$", r"${[1:7]}$", r"${[1:6]}$",
-                                                               r"${[1:5]}$", r"${[1:4]}$", r"${[1:3]}$", r"${[1:2]}$",
-                                                               r"${\{1\}}$", r"${\emptyset}$"]), fontsize=20,
-                   rotation=45)
         if stats == "dep":
             if "image" in title:
                 plt.xlabel(r"$\mathrm{\mathbb{I}}_{\rho},\ \mathrm{\mathbb{I}}_{\theta}=\mathrm{\mathbb{I}}_{\mathbf{s}},\ \hat{\mathbf{z}}_x$", fontsize=23)
             else:
                 plt.xlabel(r"$\mathrm{\mathbb{I}}_{\rho},\ \mathrm{\mathbb{I}}_{\theta}=\mathrm{\mathbb{I}}_{\mathbf{s}},\ \hat{\mathbf{z}}_t$", fontsize=23)
+            
+            plt.xticks(ticks=np.arange(10) + 0.5, labels=reversed([r"${[9]}$", r"${[8]}$", r"${[7]}$", r"${[6]}$",
+                                                               r"${[5]}$", r"${[4]}$", r"${[3]}$", r"${[2]}$",
+                                                               r"${\{1\}}$", r"${\emptyset}$"]), fontsize=20, rotation=0)
         else:
             plt.xlabel("")
+            plt.xticks(ticks=[])
+            
     else:
-        plt.xticks(ticks=np.arange(10) + 0.5, labels=[r"${[1:10]}$", r"${[1:9]}$", r"${[1:8]}$", r"${[1:7]}$",
-                                                      r"${[1:6]}$", r"${[1:5]}$", r"${[1:4]}$", r"${[1:3]}$",
-                                                      r"${[1:2]}$", r"${\{1\}}$"], fontsize=20, rotation=45)
         if stats == "dep":
             if "image" in title:
-                plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta},\ \mathrm{\mathbb{I}}_{\rho}=\emptyset,\ \hat{\mathbf{z}}_x$", fontsize=23)
+                plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta},\ \ \ \ \mathrm{\mathbb{I}}_{\rho}=\emptyset,\ \hat{\mathbf{z}}_x$", fontsize=23)
             else:
-                plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta},\ \mathrm{\mathbb{I}}_{\rho}=\emptyset,\ \hat{\mathbf{z}}_t$", fontsize=23)
+                plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta},\ \ \ \ \mathrm{\mathbb{I}}_{\rho}=\emptyset,\ \hat{\mathbf{z}}_t$", fontsize=23)
+            plt.xticks(ticks=np.arange(10) + 0.5, labels=[r"${[10]}$", r"${[9]}$", r"${[8]}$", r"${[7]}$",
+                                                r"${[6]}$", r"${[5]}$", r"${[4]}$", r"${[3]}$",
+                                                r"${[2]}$", r"${\{1\}}$"], fontsize=20, rotation=0)
         else:
             plt.xlabel("")
+            plt.xticks(ticks=[])
 
     plt.gca().invert_xaxis()  # Reverse x-axis when dropping semantics
 
     if "image" in title and mode == "drop":
-        plt.ylabel(r"Predicted factors ($R²$)", fontsize=23)
+        plt.ylabel(r"$R²$", fontsize=23)
+        plt.yticks(ticks=np.arange(len(predicted_factors)) + 0.5, labels=predicted_factors, fontsize=23, rotation=0)
     else:
         plt.ylabel("")
+        plt.yticks(ticks=[])
 
-    plt.yticks(ticks=np.arange(len(predicted_factors)) + 0.5, labels=predicted_factors, fontsize=23, rotation=0)
-
-    # Add an overall bounding box
-    ax.add_patch(plt.Rectangle((0, 0), matrix.shape[1], matrix.shape[0],
-                               linewidth=1, edgecolor='#137e6d', facecolor='none', clip_on=False))
+    # # Add an overall bounding box
+    # ax.add_patch(plt.Rectangle((0, 0), matrix.shape[1], matrix.shape[0],
+    #                            linewidth=1, edgecolor='#137e6d', facecolor='none', clip_on=False))
 
     # Save figure
     # plt.show()

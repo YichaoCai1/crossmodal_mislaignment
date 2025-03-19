@@ -34,7 +34,7 @@ def parse_args():
     parser.add_argument("--datapath", type=str, required=True)
     parser.add_argument("--model-dir", type=str, default="models")
     parser.add_argument("--model-id", type=str, default=None)
-    parser.add_argument("--bias-type", type=str, default="selection")
+    parser.add_argument("--bias-type", type=str, default="selections")
     parser.add_argument("--bias-id", type=int, default=6)
     parser.add_argument("--encoding-size", type=int, default=0)
     parser.add_argument("--hidden-size", type=int, default=100)
@@ -156,8 +156,8 @@ def main():
         # evaluation of a trained model must be added to 'arguments_to_load'.
 
     # set encoding size
-    encoding_sizes = {"selections": [3, 3, 3, 4, 5, 6, 7],
-                    "perturbations": [7, 6, 5, 4, 3, 3, 3]}
+    encoding_sizes = {"selections": [3, 3, 4, 5, 5, 6, 7],
+                    "perturbations": [7, 6, 5, 5, 4, 3, 3]}
     if args.encoding_size == 0:
         args.encoding_size = encoding_sizes[args.bias_type][args.bias_id]
     
