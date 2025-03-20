@@ -8,7 +8,7 @@ import os
 from decimal import Decimal, ROUND_HALF_UP
 
 # Define mode: "selection" or "perturbation"
-mode = "perturbation"  # Change to "selection" if needed
+mode = "selection"  # Change to "selection" if needed
 
 # Define root directory
 root_path = f"../models/MPI3d/"
@@ -42,6 +42,11 @@ df_all = df_all[["modality", "semantic_name", "mcc_logreg", "mcc_mlp", f"{mode}"
 
 # Filter to include only fixed order factors
 df_all = df_all[df_all["semantic_name"].isin(fixed_factor_order)]
+
+# Clip metric values into the range [0, 1] before aggregation
+df_all["mcc_logreg"] = df_all["mcc_logreg"].clip(0, 1)
+df_all["mcc_mlp"] = df_all["mcc_mlp"].clip(0, 1)
+
 
 # Compute mean and standard deviation across seeds
 df_grouped = df_all.groupby(["modality", "semantic_name", f"{mode}"]).agg(
@@ -119,7 +124,7 @@ heatmap_data = [
 for matrix, labels, title in heatmap_data:
     plt.figure(figsize=(5, 3))
 
-    ax = sns.heatmap(matrix, annot=labels, fmt="", cmap="BuGn", vmin=None, vmax=None, cbar=False,
+    ax = sns.heatmap(matrix, annot=labels, fmt="", cmap="GnBu", vmin=None, vmax=None, cbar=False,
                      annot_kws={"fontsize": 18})
 
     
@@ -127,7 +132,7 @@ for matrix, labels, title in heatmap_data:
     plt.xticks(ticks=np.arange(len(perturb_configs)) + 0.5, labels=circled_numbers, fontsize=20, rotation=0)
     
     if mode == "perturbation":
-        plt.gca().invert_xaxis()  # Reverse x-axis when dropping semantics
+        plt.gca().invert_xaxis()  
 
     if "image" in title:
         plt.xlabel(f"{mode} biases"+r", $\hat{\mathbf{z}}_x$", fontsize=20)
@@ -143,9 +148,9 @@ for matrix, labels, title in heatmap_data:
         plt.ylabel("")
         plt.yticks([])  # Hide y-axis tick
 
-        # Add an overall bounding box
-    ax.add_patch(plt.Rectangle((0, 0), matrix.shape[1], matrix.shape[0],
-                               linewidth=1, edgecolor='#137e6d', facecolor='none', clip_on=False))
+    # Add an overall bounding box
+    # ax.add_patch(plt.Rectangle((0, 0), matrix.shape[1], matrix.shape[0],
+    #                            linewidth=1, edgecolor='#137e6d', facecolor='none', clip_on=False))
 
     # Save figure
     plt.savefig(os.path.join(root_path, title), format="pdf", dpi=600, bbox_inches="tight")

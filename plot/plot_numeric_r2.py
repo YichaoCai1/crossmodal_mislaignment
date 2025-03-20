@@ -6,6 +6,7 @@ import glob
 import re
 import os
 from decimal import Decimal, ROUND_HALF_UP
+import matplotlib.colors as mcolors
 
 # Set font to DejaVu Sans
 # plt.rcParams["font.family"] = "DejaVu Sans"
@@ -122,7 +123,7 @@ for matrix, labels, title in heatmap_data:
     else:
         plt.figure(figsize=(6.5, 5))
 
-    ax = sns.heatmap(matrix, annot=labels, fmt="", cmap=sns.color_palette("BuGn", as_cmap=True), vmin=0, vmax=1, cbar=False,
+    ax = sns.heatmap(matrix, annot=labels, fmt="", cmap=sns.color_palette("GnBu", as_cmap=True), cbar=False, norm=mcolors.Normalize(vmin=0, vmax=1),
                      annot_kws={"fontsize": 17})  # Adjust font size of annotations
 
     

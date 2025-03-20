@@ -134,19 +134,48 @@ def complex_nonlinear_function(z: torch.Tensor) -> torch.Tensor:
     return f_z
 
 
+# def gen_class_labels(z: torch.Tensor, device, num_classes: int = 10) -> torch.Tensor:
+#     """
+#     Generates classification labels based on input features using quantile-based binning.
+#     """
+#     f_z = complex_nonlinear_function(z).to(device)
+
+#     # Compute bins dynamically from data distribution
+#     bins = torch.quantile(f_z, torch.linspace(0, 1, num_classes + 1, device=device))
+
+#     # Assign labels based on bins
+#     labels = torch.bucketize(f_z, bins) - 1  # Ensure range [0, num_classes-1]
+    
+#     return torch.clamp(labels, 0, num_classes - 1)
+
+
 def gen_class_labels(z: torch.Tensor, device, num_classes: int = 10) -> torch.Tensor:
     """
-    Generates classification labels based on input features using quantile-based binning.
-    """
-    f_z = complex_nonlinear_function(z).to(device)
-
-    # Compute bins dynamically from data distribution
-    bins = torch.quantile(f_z, torch.linspace(0, 1, num_classes + 1, device=device))
-
-    # Assign labels based on bins
-    labels = torch.bucketize(f_z, bins) - 1  # Ensure range [0, num_classes-1]
+    Generates classification labels using K-Means clustering.
     
-    return torch.clamp(labels, 0, num_classes - 1)
+    Args:
+        z (torch.Tensor): Input feature tensor of shape (N, D), where N is the number of samples.
+        device (torch.device): Device for tensor computations.
+        num_classes (int): Number of clusters (classes).
+    
+    Returns:
+        torch.Tensor: Cluster-based class labels of shape (N,)
+    """
+    z_np = z.cpu().numpy()  # Convert to NumPy for clustering
+
+    # Perform K-Means clustering
+    kmeans = KMeans(n_clusters=num_classes, n_init=10, random_state=42)
+    cluster_assignments = kmeans.fit_predict(z_np)  # Get cluster labels
+
+    # Map cluster indices to class labels based on cluster centroids order
+    cluster_centers = kmeans.cluster_centers_
+    sorted_indices = torch.argsort(torch.tensor(cluster_centers[:, 0]))  # Sort by first dimension
+    cluster_to_label = {int(cluster): int(label) for label, cluster in enumerate(sorted_indices)}
+
+    # Convert cluster assignments to class labels
+    labels = torch.tensor([cluster_to_label[c] for c in cluster_assignments], device=device)
+
+    return labels
 
 
 def generate_data(latent_space, h_x, device, num_batches=1, batch_size=4096):
@@ -171,7 +200,7 @@ def generate_data(latent_space, h_x, device, num_batches=1, batch_size=4096):
             target_lables["y3"].append(y3.unsqueeze(-1).detach().cpu().numpy())
             target_lables["y4"].append(y4.unsqueeze(-1).detach().cpu().numpy())
             
-            y5 = gen_class_labels(semantics[:, 0:5], device, num_classes=2)
+            y5 = gen_class_labels(y2.unsqueeze(-1), device, num_classes=2) #semantics[:, 0:5], device, num_classes=2)
             target_lables["y5"].append(y5.unsqueeze(-1).detach().cpu().numpy())
             
             reps.append(hz_x.detach().cpu().numpy())
@@ -254,7 +283,7 @@ def main():
     # shifted semantics space
     space_shift_semantics = NRealSpace(n_semantic, selected_indices, perturbed_indices)
     sample_marginal_shifted = lambda space, size, device=device: \
-        space.normal(None, args.margin_param, size, device, Sigma=Sigma_s, shift_ids=[7, 8, 9])
+        space.normal(None, args.margin_param, size, device, Sigma=Sigma_s, shift_ids=[8, 9])
     sample_conditional_shifted = lambda space, z, size, device=device:\
         space.normal(z, args.cond_param, size, device, change_prob=args.change_prob, Sigma=Sigma_a)
     shifted_space_list.append(LatentSpace(
@@ -394,20 +423,23 @@ def main():
         train_labels, test_labels = val_dict['labels'][k], test_dict['labels'][k]
                 
         if k != 'y5':
-            criterion = nn.MSELoss()
-            model = MLP(input_dim=train_inputs.shape[1], output_dim=1).to(device)
-            optimizer = optim.Adam(model.parameters(), lr=0.001)
+            # criterion = nn.MSELoss()
+            # model = MLP(input_dim=train_inputs.shape[1], output_dim=1).to(device)
+            # optimizer = optim.Adam(model.parameters(), lr=0.001)
             
-            model = train_mlp_regressor(model, criterion, optimizer, train_inputs, train_labels, device, epochs=10000)
+            # model = train_mlp_regressor(model, criterion, optimizer, train_inputs, train_labels, device, epochs=10000)
             
-            # eval
-            model.eval()
-            with torch.no_grad():
-                y_pred = model(torch.tensor(test_inputs, dtype=torch.float32).to(device)).cpu().numpy()
-                metric_regression = r2_score(test_labels, y_pred)
+            # # eval
+            # model.eval()
+            # with torch.no_grad():
+            #     y_pred = model(torch.tensor(test_inputs, dtype=torch.float32).to(device)).cpu().numpy()
+            #     metric_regression = r2_score(test_labels, y_pred)
             
-            # append results
-            results.append((k, metric_regression))
+            # # append results
+            # results.append((k, metric_regression))
+            
+            continue
+            
         else:
             shifted_intputs, shifted_labels = shifted_dict['reps'], shifted_dict['labels'][k]
             
@@ -428,12 +460,12 @@ def main():
                 print("Classification results:")
                 print(df_cls.to_string())
     
-    # convert evaluation results into tabular form
-    cols = ["task", "metric_scores"]
-    df_results = pd.DataFrame(results, columns=cols)
-    df_results.to_csv(os.path.join(args.save_dir, "results_predict.csv"))
-    print("Downstream Predict results:")
-    print(df_results.to_string())
+    # # convert evaluation results into tabular form
+    # cols = ["task", "metric_scores"]
+    # df_results = pd.DataFrame(results, columns=cols)
+    # df_results.to_csv(os.path.join(args.save_dir, "results_predict.csv"))
+    # print("Downstream Predict results:")
+    # print(df_results.to_string())
 
 
 if __name__ == "__main__":

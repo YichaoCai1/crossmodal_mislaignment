@@ -83,12 +83,12 @@ if data_frames:
                          color=color)
 
     # Draw vertical dashed lines only if mode == "drop"
-    if mode == "drop":
-        for idx, x in enumerate(x_positions):
-            if idx < len(df_grouped["task"].unique()):  # Ensure index is within available tasks
-                task = list(df_grouped["task"].unique())[idx]
-                color = task_colors.get(task, "black")  # Get assigned color, default to black
-                plt.axvline(x, color=color, linestyle="dashed", linewidth=1, alpha=0.3)
+    # if mode == "drop":
+    #     for idx, x in enumerate(x_positions):
+    #         if idx < len(df_grouped["task"].unique()):  # Ensure index is within available tasks
+    #             task = list(df_grouped["task"].unique())[idx]
+    #             color = task_colors.get(task, "black")  # Get assigned color, default to black
+    #             plt.axvline(x, color=color, linestyle="dashed", linewidth=1, alpha=0.3)
 
     # Formatting the plot
     plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta},\ \mathrm{\mathbb{I}}_{\rho}=\emptyset$" if mode == "drop" else r"$\mathrm{\mathbb{I}}_{\rho},\ \mathrm{\mathbb{I}}_{\theta}=\mathrm{\mathbb{I}}_{\mathbf{s}}$", fontsize=20)
@@ -99,7 +99,7 @@ if data_frames:
     
     # Reverse x-axis
     plt.gca().invert_xaxis()
-    plt.legend(fontsize=10)
+    plt.legend(fontsize=15)
 
     if stats == "ind":
         plt.title(r"Regression, Independent", fontsize=20)

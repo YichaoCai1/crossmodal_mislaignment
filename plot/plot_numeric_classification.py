@@ -4,7 +4,7 @@ import pandas as pd
 import os
 
 # Define mode and setting variables
-mode = "drop"  # or "perturb", drop
+mode = "perturb"  # or "perturb", drop
 setting = "dep"  # or "ind", dep
 
 base_dir = os.path.join("../models/Numeric/", f"{setting}_{mode}")
@@ -53,10 +53,20 @@ plt.fill_between(range(len(x_labels)), id_mins, id_maxs, color='orange', alpha=0
 plt.plot(range(len(x_labels)), ood_means, '-s', label="OOD", color='red')
 plt.fill_between(range(len(x_labels)), ood_mins, ood_maxs, color='red', alpha=0.2)
 
+plt.xlim(-0.5, 9.5)  # Ensure full x-axis coverage
+
 # Formatting the plot
 if mode == "drop":
+    # Shadow specific regions
+    plt.axvspan(1.5, 9.5, color="#cce5ff", alpha=0.2, label="inv.")  # Second region (6-8)
+    plt.axvspan(-0.5, 1.5, color="#f4cccc", alpha=0.2, label="shift")  # Last region (9-10)
+    plt.axvline(5, color="#008080", linestyle="dashed", linewidth=1, alpha=0.3)
+    
     plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta},\ \mathrm{\mathbb{I}}_{\rho}=\emptyset$", fontsize=20)
 else:
+    # Shadow specific regions
+    plt.axvspan(-0.5, 7.5, color="#cce5ff", alpha=0.2, label="inv.")  # Last region (9-10)
+    plt.axvspan(7.5, 9.5, color="#f4cccc", alpha=0.2, label="shift")  # Second region (6-8)
     plt.xlabel(r"$\mathrm{\mathbb{I}}_{\rho},\ \mathrm{\mathbb{I}}_{\theta}=\mathrm{\mathbb{I}}_{\mathbf{s}}$", fontsize=20)
 
 # Reverse x-axis
@@ -64,13 +74,14 @@ plt.gca().invert_xaxis()
 
 if setting == "ind":
     plt.ylabel(r"MCC", fontsize=20)
-plt.xticks(ticks=np.arange(10), labels=x_labels, fontsize=16, rotation=45)
+plt.xticks(ticks=np.arange(10), labels=x_labels, fontsize=16, rotation=0)
 plt.yticks(fontsize=16)
 
+plt.legend(fontsize=14, ncol=2, loc="best", handletextpad=0.4, columnspacing=0.5)
 if setting == "ind":
-    plt.legend(fontsize=20)
     plt.title(r"Classification, Independent", fontsize=20)
 else:
+
     plt.title(r"Classification, Dependent", fontsize=20)
 
 plt.savefig(os.path.join(base_dir, "predict_class.pdf"), format="pdf", dpi=600, bbox_inches="tight")
