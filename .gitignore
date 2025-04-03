@@ -137,9 +137,9 @@ dmypy.json
 # Project-specific
 data/
 models/
+old_bashes/
 *.backup
 *.log
 lsf.o*
 tags
-old_bashes/*
 logs/
