@@ -30,12 +30,12 @@ df_all = pd.concat(data, ignore_index=True)
 
 # Rename factor names for better readability
 rename_dict = {
-    "object_shape": "obj. shape", "object_xpos": "obj. x_pos", "object_ypos": "obj. y_pos", "object_zpos": "obj. z",
-    "object_alpharot": "obj. alpha", "object_betarot": "obj. beta", "object_gammarot": "obj. gamma",
-    "object_color": "obj. color", "spotlight_pos": "spot. pos", "spotlight_color": "spot. color",
-    "background_color": "back. color", "object_color_index": "obj. color",
-    "splotlight_color_index": "spot. color", "background_color_index": "back. color",
-    "text_phrasing": "phrasing"
+    "object_shape": "shape", "object_xpos": "x_pos", "object_ypos": "y_pos", "object_zpos": "obj. z",
+    "object_alpharot": "alpha", "object_betarot": "beta", "object_gammarot": "gamma",
+    "object_color": "color", "spotlight_pos": "s_pos", "spotlight_color": "s_color",
+    "background_color": "b_color", "object_color_index": "color",
+    "splotlight_color_index": "s_color", "background_color_index": "b_color",
+    "text_phrasing": "phrase"
 }
 df_all["factor_name"] = df_all["factor_name"].replace(rename_dict)
 
@@ -61,11 +61,11 @@ df_grouped = df_all.groupby([f"{mode}", "modality", "factor_name"]).agg(
 
 # Define the fixed y-axis ordering for each modality
 factor_order_image = [
-    "obj. alpha", "obj. beta", "obj. gamma", "obj. shape", "obj. x_pos", "obj. y_pos", "obj. color", "spot. pos", "spot. color", "back. color"
+    "alpha", "beta", "gamma", "shape", "x_pos", "y_pos", "s_pos", "color", "s_color", "b_color"
 ]
 factor_order_text = [
-    "phrasing", "obj. shape", "obj. x_pos", "obj. y_pos", "spot. pos",
-    "obj. color", "spot. color", "back. color"
+    "phrase", "shape", "x_pos", "y_pos", "s_pos",
+    "color", "s_color", "b_color"
 ]
 
 # Pivot the dataframe for heatmap format (Separate Image and Text)
@@ -79,10 +79,10 @@ df_nonlinear_text = df_grouped[df_grouped["modality"] == "text"].pivot(index="fa
 # Define function to plot and save heatmaps
 def plot_heatmap(data, title, save_path, cmap="GnBu"):
     plt.figure(figsize=(8, 5))
-    ax = sns.heatmap(data, annot=True, fmt=".2f", cmap=cmap, 
+    ax = sns.heatmap(data, annot=True, fmt=".1f", cmap=cmap, 
                      mask=data.isnull(),  # Black out missing values
                      cbar=False,
-                     annot_kws={"fontsize": 19})
+                     annot_kws={"fontsize": 20})
 
     # Convert numeric x-tick labels to circled numbers (1-7)
     circled_numbers = ["①", "②", "③", "④", "⑤", "⑥", "⑦"]
@@ -96,12 +96,11 @@ def plot_heatmap(data, title, save_path, cmap="GnBu"):
     plt.xlabel(f"{mode} settings", fontsize=25)
     
     if mode == "selections":
-        plt.ylabel(r"$R^2$ / MCC", fontsize=25)  # Make ylabel bold
-        plt.yticks(rotation=0, fontsize=20, fontweight="bold")  # Make yticks bold
+        plt.ylabel(r"$R^2$ / MCC", fontsize=25)  # Make ylabel bold 
     else:
         plt.ylabel("")
-        plt.yticks([])
-        plt.gca().invert_xaxis()  
+        plt.gca().invert_xaxis() 
+    plt.yticks(rotation=0, fontsize=20, fontweight="bold")  # Make yticks bold
     
     # Save the figure as a PDF
     plt.savefig(save_path, format="pdf", bbox_inches="tight")

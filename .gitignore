@@ -141,3 +141,5 @@ models/
 *.log
 lsf.o*
 tags
+old_bashes/
+logs/

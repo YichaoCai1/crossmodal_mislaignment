@@ -1,9 +1,3 @@
-'''
- # @ Author: Yichao Cai
- # @ Create Time: 2025-02-28 01:46:56
- # @ Description: Datasets: MPI3DReal, Causal3DIdent
- '''
- 
 import io
 import os
 import json
@@ -34,14 +28,6 @@ class MultimodalMPI3DRealComplex(torch.utils.data.Dataset):
         ["OBJ_COLOR", "OBJ_SHAPE", "OBJ_SIZE", "CAMERA"],
         ["OBJ_COLOR", "OBJ_SHAPE", "OBJ_SIZE", "CAMERA", "BACKGROUND"],
     ]   # For simplicity, we only consider a increasing order of selection here.
-    
-    # PERTURBATION_BIAS = [
-    #     [],
-    #     ['OBJ_COLOR'],
-    #     ['OBJ_COLOR', "OBJ_SHAPE"],
-    #     ["OBJ_COLOR", "OBJ_SHAPE", "OBJ_SIZE"],
-    #     ["OBJ_COLOR", "OBJ_SHAPE", "OBJ_SIZE", "CAMERA"],
-    # ]
     
     PERTURBATION_BIAS = [
         [],
@@ -209,4 +195,4 @@ if __name__ == "__main__":
     dataset = MultimodalMPI3DRealComplex(train_ratio=0.9)
     print("Dataset Initialized...\n")
     
-    dataset.generate_files("./MPI3d_real_complex")
+    dataset.generate_files(r"data/MPI3d_real_complex")

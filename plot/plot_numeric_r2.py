@@ -13,7 +13,7 @@ import matplotlib.colors as mcolors
 
 # Load all files matching the pattern
 mode = "drop"   # drop, perturb
-stats = "ind"   # ind, dep
+stats = "dep"   # ind, dep
 
 root_path = f"../models/Numeric/{stats}_{mode}/"
 file_paths = glob.glob(os.path.join(root_path, f"{stats}_{mode}*_tr*/results.csv"))  # Adjust with actual path
@@ -129,35 +129,35 @@ for matrix, labels, title in heatmap_data:
     
     # Set axis labels
     if mode == "perturb":
-        if stats == "dep":
-            if "image" in title:
-                plt.xlabel(r"$\mathrm{\mathbb{I}}_{\rho},\ \mathrm{\mathbb{I}}_{\theta}=\mathrm{\mathbb{I}}_{\mathbf{s}},\ \hat{\mathbf{z}}_x$", fontsize=23)
-            else:
-                plt.xlabel(r"$\mathrm{\mathbb{I}}_{\rho},\ \mathrm{\mathbb{I}}_{\theta}=\mathrm{\mathbb{I}}_{\mathbf{s}},\ \hat{\mathbf{z}}_t$", fontsize=23)
-            
-            plt.xticks(ticks=np.arange(10) + 0.5, labels=reversed([r"${[9]}$", r"${[8]}$", r"${[7]}$", r"${[6]}$",
-                                                               r"${[5]}$", r"${[4]}$", r"${[3]}$", r"${[2]}$",
-                                                               r"${\{1\}}$", r"${\emptyset}$"]), fontsize=20, rotation=0)
+        # if stats == "dep" or "enlarged" in title or "nonlinear" not in title:
+        if "image" in title:
+            plt.xlabel(r"$\mathrm{\mathbb{I}}_{\rho},\ \mathrm{\mathbb{I}}_{\theta}=\mathrm{\mathbb{I}}_{\mathbf{s}},\ \hat{\mathbf{z}}_x$", fontsize=23)
         else:
-            plt.xlabel("")
-            plt.xticks(ticks=[])
+            plt.xlabel(r"$\mathrm{\mathbb{I}}_{\rho},\ \mathrm{\mathbb{I}}_{\theta}=\mathrm{\mathbb{I}}_{\mathbf{s}},\ \hat{\mathbf{z}}_t$", fontsize=23)
+        
+        plt.xticks(ticks=np.arange(10) + 0.5, labels=reversed([r"${[9]}$", r"${[8]}$", r"${[7]}$", r"${[6]}$",
+                                                            r"${[5]}$", r"${[4]}$", r"${[3]}$", r"${[2]}$",
+                                                            r"${\{1\}}$", r"${\emptyset}$"]), fontsize=20, rotation=0)
+        # else:
+        #     plt.xlabel("")
+        #     plt.xticks(ticks=[])
             
     else:
-        if stats == "dep":
-            if "image" in title:
-                plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta},\ \ \ \ \mathrm{\mathbb{I}}_{\rho}=\emptyset,\ \hat{\mathbf{z}}_x$", fontsize=23)
-            else:
-                plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta},\ \ \ \ \mathrm{\mathbb{I}}_{\rho}=\emptyset,\ \hat{\mathbf{z}}_t$", fontsize=23)
-            plt.xticks(ticks=np.arange(10) + 0.5, labels=[r"${[10]}$", r"${[9]}$", r"${[8]}$", r"${[7]}$",
-                                                r"${[6]}$", r"${[5]}$", r"${[4]}$", r"${[3]}$",
-                                                r"${[2]}$", r"${\{1\}}$"], fontsize=20, rotation=0)
+        # if stats == "dep" or "enlarged" in title or "nonlinear" not in title:
+        if "image" in title:
+            plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta},\ \ \ \ \mathrm{\mathbb{I}}_{\rho}=\emptyset,\ \hat{\mathbf{z}}_x$", fontsize=23)
         else:
-            plt.xlabel("")
-            plt.xticks(ticks=[])
+            plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta},\ \ \ \ \mathrm{\mathbb{I}}_{\rho}=\emptyset,\ \hat{\mathbf{z}}_t$", fontsize=23)
+        plt.xticks(ticks=np.arange(10) + 0.5, labels=[r"${[10]}$", r"${[9]}$", r"${[8]}$", r"${[7]}$",
+                                            r"${[6]}$", r"${[5]}$", r"${[4]}$", r"${[3]}$",
+                                            r"${[2]}$", r"${\{1\}}$"], fontsize=20, rotation=0)
+        # else:
+        #     plt.xlabel("")
+        #     plt.xticks(ticks=[])
 
     plt.gca().invert_xaxis()  # Reverse x-axis when dropping semantics
 
-    if "image" in title and mode == "drop":
+    if ("image" in title and stats == "ind"):
         plt.ylabel(r"$R²$", fontsize=23)
         plt.yticks(ticks=np.arange(len(predicted_factors)) + 0.5, labels=predicted_factors, fontsize=23, rotation=0)
     else:
