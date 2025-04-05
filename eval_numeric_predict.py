@@ -134,21 +134,6 @@ def complex_nonlinear_function(z: torch.Tensor) -> torch.Tensor:
     return f_z
 
 
-# def gen_class_labels(z: torch.Tensor, device, num_classes: int = 10) -> torch.Tensor:
-#     """
-#     Generates classification labels based on input features using quantile-based binning.
-#     """
-#     f_z = complex_nonlinear_function(z).to(device)
-
-#     # Compute bins dynamically from data distribution
-#     bins = torch.quantile(f_z, torch.linspace(0, 1, num_classes + 1, device=device))
-
-#     # Assign labels based on bins
-#     labels = torch.bucketize(f_z, bins) - 1  # Ensure range [0, num_classes-1]
-    
-#     return torch.clamp(labels, 0, num_classes - 1)
-
-
 def gen_class_labels(z: torch.Tensor, device, num_classes: int = 10) -> torch.Tensor:
     """
     Generates classification labels using K-Means clustering.
@@ -423,22 +408,20 @@ def main():
         train_labels, test_labels = val_dict['labels'][k], test_dict['labels'][k]
                 
         if k != 'y5':
-            # criterion = nn.MSELoss()
-            # model = MLP(input_dim=train_inputs.shape[1], output_dim=1).to(device)
-            # optimizer = optim.Adam(model.parameters(), lr=0.001)
+            criterion = nn.MSELoss()
+            model = MLP(input_dim=train_inputs.shape[1], output_dim=1).to(device)
+            optimizer = optim.Adam(model.parameters(), lr=0.001)
             
-            # model = train_mlp_regressor(model, criterion, optimizer, train_inputs, train_labels, device, epochs=10000)
+            model = train_mlp_regressor(model, criterion, optimizer, train_inputs, train_labels, device, epochs=10000)
             
-            # # eval
-            # model.eval()
-            # with torch.no_grad():
-            #     y_pred = model(torch.tensor(test_inputs, dtype=torch.float32).to(device)).cpu().numpy()
-            #     metric_regression = r2_score(test_labels, y_pred)
+            # eval
+            model.eval()
+            with torch.no_grad():
+                y_pred = model(torch.tensor(test_inputs, dtype=torch.float32).to(device)).cpu().numpy()
+                metric_regression = r2_score(test_labels, y_pred)
             
-            # # append results
-            # results.append((k, metric_regression))
-            
-            continue
+            # append results
+            results.append((k, metric_regression))
             
         else:
             shifted_intputs, shifted_labels = shifted_dict['reps'], shifted_dict['labels'][k]
@@ -460,12 +443,12 @@ def main():
                 print("Classification results:")
                 print(df_cls.to_string())
     
-    # # convert evaluation results into tabular form
-    # cols = ["task", "metric_scores"]
-    # df_results = pd.DataFrame(results, columns=cols)
-    # df_results.to_csv(os.path.join(args.save_dir, "results_predict.csv"))
-    # print("Downstream Predict results:")
-    # print(df_results.to_string())
+    # convert evaluation results into tabular form
+    cols = ["task", "metric_scores"]
+    df_results = pd.DataFrame(results, columns=cols)
+    df_results.to_csv(os.path.join(args.save_dir, "results_predict.csv"))
+    print("Downstream Predict results:")
+    print(df_results.to_string())
 
 
 if __name__ == "__main__":
