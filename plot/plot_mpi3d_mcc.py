@@ -8,7 +8,7 @@ import os
 from decimal import Decimal, ROUND_HALF_UP
 
 # Define mode: "selection" or "perturbation"
-mode = "selection"  # Change to "selection" if needed
+mode = "perturbation"  # Change to "selection" if needed
 
 # Define root directory
 root_path = f"../models/MPI3d/"
@@ -100,7 +100,7 @@ def format_labels(mean_df, std_df):
         for j in range(formatted.shape[1]):
             mean_val = mean_df.iloc[i, j]
             std_val = std_df.iloc[i, j] if not np.isnan(std_df.iloc[i, j]) else 0.0
-            rounded_value = Decimal(mean_val).quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
+            rounded_value = Decimal(mean_val).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
             formatted.iloc[i, j] = f"{rounded_value}"
     return formatted
 
@@ -124,7 +124,7 @@ heatmap_data = [
 for matrix, labels, title in heatmap_data:
     plt.figure(figsize=(5, 3))
 
-    ax = sns.heatmap(matrix, annot=labels, fmt="", cmap="GnBu", vmin=None, vmax=None, cbar=False,
+    ax = sns.heatmap(matrix, annot=labels, fmt="", cmap="BuGn", vmin=None, vmax=None, cbar=False,
                      annot_kws={"fontsize": 18})
 
     

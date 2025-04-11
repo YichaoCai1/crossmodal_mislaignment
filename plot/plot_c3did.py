@@ -77,13 +77,17 @@ df_nonlinear_text = df_grouped[df_grouped["modality"] == "text"].pivot(index="fa
 
 
 # Define function to plot and save heatmaps
-def plot_heatmap(data, title, save_path, cmap="GnBu"):
-    plt.figure(figsize=(8, 5))
-    ax = sns.heatmap(data, annot=True, fmt=".1f", cmap=cmap, 
+def plot_heatmap(data, title, save_path, cmap="BuGn"):
+    plt.figure(figsize=(10, 5))
+    ax = sns.heatmap(data, annot=True, fmt=".2f", cmap=cmap, 
                      mask=data.isnull(),  # Black out missing values
-                     cbar=False,
+                     cbar=True,
                      annot_kws={"fontsize": 20})
 
+    # Set colorbar tick label size
+    cbar = ax.collections[0].colorbar
+    cbar.ax.tick_params(labelsize=20)  # adjust fontsize here
+    
     # Convert numeric x-tick labels to circled numbers (1-7)
     circled_numbers = ["①", "②", "③", "④", "⑤", "⑥", "⑦"]
     xticks = data.columns.tolist()  # Get column labels (selection settings)

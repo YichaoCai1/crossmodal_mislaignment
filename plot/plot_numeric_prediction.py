@@ -6,7 +6,7 @@ import re
 import os
 
 # Load all result_predict.csv files from the specified directory pattern
-mode = "drop"  # or "perturb", drop
+mode = "perturb"  # or "perturb", drop
 stats = "dep"  # or "ind", dep
 root_path = f"../models/Numeric/{stats}_{mode}/"
 file_paths = glob.glob(os.path.join(root_path, f"{stats}_{mode}*_tr*/results_predict.csv"))
@@ -99,7 +99,7 @@ if data_frames:
     
     # Reverse x-axis
     plt.gca().invert_xaxis()
-    plt.legend(fontsize=15)
+    plt.legend(fontsize=15, ncol=2, loc="best", handletextpad=0.4, columnspacing=0.5)
 
     if stats == "ind":
         plt.title(r"Regression, Independent", fontsize=20)

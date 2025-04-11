@@ -12,8 +12,8 @@ import matplotlib.colors as mcolors
 # plt.rcParams["font.family"] = "DejaVu Sans"
 
 # Load all files matching the pattern
-mode = "drop"   # drop, perturb
-stats = "dep"   # ind, dep
+mode = "perturb"   # drop, perturb
+stats = "ind"   # ind, dep
 
 root_path = f"../models/Numeric/{stats}_{mode}/"
 file_paths = glob.glob(os.path.join(root_path, f"{stats}_{mode}*_tr*/results.csv"))  # Adjust with actual path
@@ -123,7 +123,7 @@ for matrix, labels, title in heatmap_data:
     else:
         plt.figure(figsize=(6.5, 5))
 
-    ax = sns.heatmap(matrix, annot=labels, fmt="", cmap=sns.color_palette("GnBu", as_cmap=True), cbar=False, norm=mcolors.Normalize(vmin=0, vmax=1),
+    ax = sns.heatmap(matrix, annot=labels, fmt="", cmap=sns.color_palette("BuGn", as_cmap=True), cbar=False, norm=mcolors.Normalize(vmin=0, vmax=1),
                      annot_kws={"fontsize": 17})  # Adjust font size of annotations
 
     

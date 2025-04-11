@@ -4,7 +4,7 @@ import pandas as pd
 import os
 
 # Define mode and setting variables
-mode = "perturb"  # or "perturb", drop
+mode = "drop"  # or "perturb", drop
 setting = "dep"  # or "ind", dep
 
 base_dir = os.path.join("../models/Numeric/", f"{setting}_{mode}")
@@ -57,16 +57,21 @@ plt.xlim(-0.5, 9.5)  # Ensure full x-axis coverage
 
 # Formatting the plot
 if mode == "drop":
-    # Shadow specific regions
-    plt.axvspan(1.5, 9.5, color="#cce5ff", alpha=0.2, label="inv.")  # Second region (6-8)
-    plt.axvspan(-0.5, 1.5, color="#f4cccc", alpha=0.2, label="shift")  # Last region (9-10)
-    plt.axvline(5, color="#008080", linestyle="dashed", linewidth=1, alpha=0.3)
+    # # Shadow specific regions
+    # plt.axvspan(1.5, 9.5, color="#cce5ff", alpha=0.3, label="inv.")  # Second region (6-8)
+    # plt.axvspan(-0.5, 1.5, color="#f4cccc", alpha=0.3, label="shift")  # Last region (9-10)
+    
+    # 1. Shift region (light red, low opacity but clear)
+    plt.axvspan(-0.5, 1.5, color="#ffcccc", alpha=0.4, zorder=0, label="shift")
+    # 2. Invariant region (light blue)
+    plt.axvspan(1.5, 9.5, color="#cce5ff", alpha=0.4, zorder=0, label="inv.")
+    plt.axvline(5, color="#008080", linestyle="dashed", linewidth=1, alpha=0.4)
     
     plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta},\ \mathrm{\mathbb{I}}_{\rho}=\emptyset$", fontsize=20)
 else:
     # Shadow specific regions
-    plt.axvspan(-0.5, 7.5, color="#cce5ff", alpha=0.2, label="inv.")  # Last region (9-10)
-    plt.axvspan(7.5, 9.5, color="#f4cccc", alpha=0.2, label="shift")  # Second region (6-8)
+    plt.axvspan(-0.5, 7.5, color="#cce5ff", alpha=0.4, label="inv.")  # Last region (9-10)
+    plt.axvspan(7.5, 9.5, color="#ffcccc", alpha=0.4, label="shift")  # Second region (6-8)
     plt.xlabel(r"$\mathrm{\mathbb{I}}_{\rho},\ \mathrm{\mathbb{I}}_{\theta}=\mathrm{\mathbb{I}}_{\mathbf{s}}$", fontsize=20)
 
 # Reverse x-axis
