@@ -1,6 +1,6 @@
 # Crossmodal Misalignment
 
-Official code for the paper:  **"How Misalignment Shapes Multimodal Learning: A Double-Edged Lens"**
+Official code for the paper:  **"Negate or Embrace: On How Misalignment Shapes Multimodal Representation Learning"**
 
 ---
 
