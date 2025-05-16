@@ -3,92 +3,143 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 
-# Define mode and setting variables
-mode = "drop"  # or "perturb", drop
-setting = "dep"  # or "ind", dep
+import seaborn as sns
+from matplotlib.patches import Patch
 
+# -----------------------------------------------------------------------------
+# Style setup
+# -----------------------------------------------------------------------------
+# sns.set_style("ticks")
+plt.style.use('fast')
+plt.rc("font", family="DejaVu Sans")
+plt.rcParams["axes.xmargin"] = 0
+
+# high-contrast, colorblind-friendly palette
+palette     = sns.color_palette("tab10")
+id_color    = palette[0]    # deep blue
+ood_color   = palette[1]    # orange
+inv_color   = "#ffffff"     # light gray for shift span
+shift_color = "#e0e0e0"     # darker gray for inv. span
+
+# -----------------------------------------------------------------------------
+# Define mode and directory
+# -----------------------------------------------------------------------------
+mode    = "perturb"    # drop or "perturb"
+setting = "ind"     # dep or "ind"
 base_dir = os.path.join("../models/Numeric/", f"{setting}_{mode}")
 
-# Define x-axis labels based on mode
+# -----------------------------------------------------------------------------
+# Build x-axis labels
+# -----------------------------------------------------------------------------
 if mode == "drop":
-    x_labels = [r"${[10]}$", r"${[9]}$", r"${[8]}$", r"${[7]}$", r"${[6]}$",
-                r"${[5]}$", r"${[4]}$", r"${[3]}$", r"${[2]}$", r"${\{1\}}$"]
+    x_labels = [
+        r"${[10]}$", r"${[9]}$", r"${[8]}$", r"${[7]}$", r"${[6]}$",
+        r"${[5]}$",  r"${[4]}$", r"${[3]}$", r"${[2]}$", r"${\{1\}}$"
+    ]
 else:
-    x_labels = list(reversed([r"${[9]}$", r"${[8]}$", r"${[7]}$", r"${[6]}$",
-                                r"${[5]}$", r"${[4]}$", r"${[3]}$", r"${[2]}$", r"${\{1\}}$", r"${\emptyset}$"]))
+    x_labels = list(reversed([
+        r"${[9]}$", r"${[8]}$", r"${[7]}$", r"${[6]}$", r"${[5]}$",
+        r"${[4]}$", r"${[3]}$", r"${[2]}$", r"${\{1\}}$", r"${\emptyset}$"
+    ]))
 
-# Initialize lists to store results
+# -----------------------------------------------------------------------------
+# Collect ID / OOD metrics across biases & trials
+# -----------------------------------------------------------------------------
 id_means, id_mins, id_maxs = [], [], []
 ood_means, ood_mins, ood_maxs = [], [], []
 
-# Loop through drop settings (0-9) and collect results from all trials (tr1-tr3)
-for bias in range(10):  # Assuming 10 drop settings (0-9)
+for bias in range(10):
     id_vals, ood_vals = [], []
+    for trial in range(1, 4):
+        fp = os.path.join(base_dir, f"{setting}_{mode}{bias}_tr{trial}", "results_classify.csv")
+        if os.path.exists(fp):
+            df = pd.read_csv(fp)
+            id_vals.append(df["iid"].iat[0])
+            ood_vals.append(df["ood"].iat[0])
+    if id_vals:
+        id_means.append(np.mean(id_vals))
+        id_mins .append(np.min(id_vals))
+        id_maxs .append(np.max(id_vals))
+    else:
+        id_means.append(np.nan); id_mins.append(np.nan); id_maxs.append(np.nan)
+    if ood_vals:
+        ood_means.append(np.mean(ood_vals))
+        ood_mins .append(np.min(ood_vals))
+        ood_maxs .append(np.max(ood_vals))
+    else:
+        ood_means.append(np.nan); ood_mins.append(np.nan); ood_maxs.append(np.nan)
 
-    for trial in range(1, 4):  # Assuming trials tr1, tr2, tr3
-        file_path = os.path.join(base_dir, f"{setting}_{mode}{bias}_tr{trial}", "results_classify.csv")
+# -----------------------------------------------------------------------------
+# Plot
+# -----------------------------------------------------------------------------
+plt.figure(figsize=(5.2, 3.5))
 
-        if os.path.exists(file_path):
-            df = pd.read_csv(file_path)
-            id_vals.append(df["iid"].values[0])
-            ood_vals.append(df["ood"].values[0])
-    
-    # Compute mean, min, and max for each drop setting
-    id_means.append(np.mean(id_vals) if id_vals else np.nan)
-    id_mins.append(np.min(id_vals) if id_vals else np.nan)
-    id_maxs.append(np.max(id_vals) if id_vals else np.nan)
-
-    ood_means.append(np.mean(ood_vals) if ood_vals else np.nan)
-    ood_mins.append(np.min(ood_vals) if ood_vals else np.nan)
-    ood_maxs.append(np.max(ood_vals) if ood_vals else np.nan)
-
-# Plot ID and OOD MCC curves with shaded regions for min-max bounds
-plt.figure(figsize=(5.2, 3.5)) # if setting == "ind" else (5, 4))
-
-# Plot ID MCC with shaded region (bounded by min-max)
-plt.plot(range(len(x_labels)), id_means, '-o', label="ID", color='orange')
-plt.fill_between(range(len(x_labels)), id_mins, id_maxs, color='orange', alpha=0.2)
-
-# Plot OOD MCC with shaded region (bounded by min-max)
-plt.plot(range(len(x_labels)), ood_means, '-s', label="OOD", color='red')
-plt.fill_between(range(len(x_labels)), ood_mins, ood_maxs, color='red', alpha=0.2)
-
-plt.xlim(-0.5, 9.5)  # Ensure full x-axis coverage
-
-# Formatting the plot
+# Draw background spans (no legend entries)
 if mode == "drop":
-    # # Shadow specific regions
-    # plt.axvspan(1.5, 9.5, color="#cce5ff", alpha=0.3, label="inv.")  # Second region (6-8)
-    # plt.axvspan(-0.5, 1.5, color="#f4cccc", alpha=0.3, label="shift")  # Last region (9-10)
-    
-    # 1. Shift region (light red, low opacity but clear)
-    plt.axvspan(-0.5, 1.5, color="#ffcccc", alpha=0.4, zorder=0, label="shift")
-    # 2. Invariant region (light blue)
-    plt.axvspan(1.5, 9.5, color="#cce5ff", alpha=0.4, zorder=0, label="inv.")
-    plt.axvline(5, color="#008080", linestyle="dashed", linewidth=1, alpha=0.4)
-    
+    plt.axvspan(1.5, 9.5,  color=inv_color,   alpha=0.5, label="_nolegend_")
+    plt.axvspan(-0.5, 1.5, color=shift_color, alpha=0.5, label="_nolegend_")
+    plt.axvline(4.5, color=palette[2], linestyle="--", alpha=0.6)
     plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta},\ \mathrm{\mathbb{I}}_{\rho}=\emptyset$", fontsize=20)
 else:
-    # Shadow specific regions
-    plt.axvspan(-0.5, 7.5, color="#cce5ff", alpha=0.4, label="inv.")  # Last region (9-10)
-    plt.axvspan(7.5, 9.5, color="#ffcccc", alpha=0.4, label="shift")  # Second region (6-8)
+    plt.axvspan(-0.5, 7.5, color=inv_color,   alpha=0.5, label="_nolegend_")
+    plt.axvspan(7.5, 9.5,  color=shift_color, alpha=0.5, label="_nolegend_")
     plt.xlabel(r"$\mathrm{\mathbb{I}}_{\rho},\ \mathrm{\mathbb{I}}_{\theta}=\mathrm{\mathbb{I}}_{\mathbf{s}}$", fontsize=20)
 
-# Reverse x-axis
+# Plot ID line & fill
+ln1, = plt.plot(
+    range(10), id_means, "-o",
+    color=id_color,
+    markerfacecolor=id_color,
+    markeredgecolor=id_color,
+    markeredgewidth=0.1,
+    markersize=7,
+    label="ID"
+)
+plt.fill_between(range(10), id_mins, id_maxs, color=id_color, alpha=0.2)
+
+# Plot OOD line & fill
+ln2, = plt.plot(
+    range(10), ood_means, "--s",
+    color=ood_color,
+    markerfacecolor=ood_color,
+    markeredgecolor=ood_color,
+    markeredgewidth=0.1,
+    markersize=7,
+    label="OOD"
+)
+plt.fill_between(range(10), ood_mins, ood_maxs, color=ood_color, alpha=0.2)
+
+# Axes formatting
 plt.gca().invert_xaxis()
-
+plt.xticks(np.arange(10), x_labels, fontsize=16)
+plt.yticks(np.arange(0, 1.01, 0.2), fontsize=16)
 if setting == "ind":
-    plt.ylabel(r"MCC", fontsize=20)
-plt.xticks(ticks=np.arange(10), labels=x_labels, fontsize=16, rotation=0)
-plt.yticks(fontsize=16)
+    plt.ylabel("MCC", fontsize=20)
+    
+plt.title(
+    "Classification, Independent" if setting == "ind" else "Classification, Dependent",
+    fontsize=20
+)
 
-plt.legend(fontsize=14, ncol=2, loc="best", handletextpad=0.4, columnspacing=0.5)
-if setting == "ind":
-    plt.title(r"Classification, Independent", fontsize=20)
-else:
+# Custom legend with high-contrast boundaries
+patch_shift = Patch(facecolor=shift_color, edgecolor="k", alpha=0.5, label="shift")
+patch_inv   = Patch(facecolor=inv_color,   edgecolor="k", alpha=0.5, label="inv.")
+plt.legend(
+    handles=[ln1, ln2, patch_shift, patch_inv],
+    fontsize=14,
+    ncol=2,
+    frameon=False,
+    handletextpad=0.3,
+    handlelength=2
+)
 
-    plt.title(r"Classification, Dependent", fontsize=20)
+# sns.despine(trim=True, left=False, bottom=False)  # keep top/right
 
-plt.savefig(os.path.join(base_dir, "predict_class.pdf"), format="pdf", dpi=600, bbox_inches="tight")
-# plt.show()
+# Save and close
+plt.savefig(
+    os.path.join(base_dir, "predict_class.pdf"),
+    format="pdf",
+    dpi=600,
+    bbox_inches="tight"
+)
 plt.close()
