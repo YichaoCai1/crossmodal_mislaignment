@@ -496,33 +496,33 @@ if __name__ == "__main__":
     
     dataset = MultimodalMPI3DRealComplex("./data/MPI3d_real_complex", bias_type="selection", bias_id=4, mode="train")
 
-    # # Select 10 random indices
-    # indices = np.random.choice(len(dataset), 20, replace=False)
+    # Select 10 random indices
+    indices = np.random.choice(len(dataset), 10, replace=False)
 
-    # # Retrieve images
-    # images = [dataset[i]["image"] for i in indices]
+    # Retrieve images
+    images = [dataset[i]["image"] for i in indices]
 
-    # # Create a grid of images in one row
-    # image_grid = make_grid(images, nrow=10, padding=2, normalize=True)
+    # Create a grid of images in one row
+    image_grid = make_grid(images, nrow=10, padding=2, normalize=True)
 
-    # # Plot images
-    # plt.figure(figsize=(20, 5))
-    # plt.imshow(image_grid.permute(1, 2, 0))  # Convert (C, H, W) to (H, W, C)
-    # plt.axis("off")
-    # plt.savefig("mpi_sample.pdf", format="pdf", dpi=600, bbox_inches="tight")
-    # plt.title("10 Random Images from MultimodalMPI3DRealComplex Dataset")
-    # plt.show()
-    
-    # Get the third image (index 2)
-    third_image = dataset[2]["image"]  # This should be a tensor of shape (C, H, W)
-
-    # Convert tensor to NumPy array for plotting
-    img_np = third_image.permute(1, 2, 0).numpy()  # Convert to (H, W, C)
-
-    # Plot and save
-    plt.figure(figsize=(5, 5))
-    plt.imshow(img_np)
+    # Plot images
+    plt.figure(figsize=(20, 5))
+    plt.imshow(image_grid.permute(1, 2, 0))  # Convert (C, H, W) to (H, W, C)
     plt.axis("off")
-    plt.title("Third Image from Dataset")
-    plt.savefig("third_image.png", format="png", dpi=600, bbox_inches="tight")
+    plt.savefig("mpi_sample.pdf", format="pdf", dpi=600, bbox_inches="tight")
+    plt.title("10 Random Images from MultimodalMPI3DRealComplex Dataset")
     plt.show()
+    
+    # # Get the third image (index 2)
+    # third_image = dataset[2]["image"]  # This should be a tensor of shape (C, H, W)
+
+    # # Convert tensor to NumPy array for plotting
+    # img_np = third_image.permute(1, 2, 0).numpy()  # Convert to (H, W, C)
+
+    # # Plot and save
+    # plt.figure(figsize=(5, 5))
+    # plt.imshow(img_np)
+    # plt.axis("off")
+    # plt.title("Third Image from Dataset")
+    # plt.savefig("third_image.png", format="png", dpi=600, bbox_inches="tight")
+    # plt.show()
