@@ -137,6 +137,30 @@ python main_causal3dident.py \
     --bias-id 1
 ```
 
+## 5 Zero-Shot Evaluation on OpenCLIP Trained with LAION-400M
+
+### 5.1 Caption Download & Data Preparation
+
+We collect **146 concepts** across **15 distinct concept groups**, crawling up to **200 images per concept** and manually removing clearly irrelevant samples.  
+You can download the curated image dataset from [flickr_images (Google Drive)](https://drive.google.com/file/d/1qZedmuAt9GfRsmkVNzyEqrqomQWV9GGE/view?usp=sharing).
+
+### Instructions
+
+Download and extract the image dataset into the `clip_probing` directory. Then, run the following commands in sequence:
+
+```bash
+# Step 1: Download LAION-400M captions
+python clip_probing/downloading_laion400_captions.py
+
+# Step 2: Compute concept frequency and plot caption coverage
+cd clip_probing
+python count_frequency.py
+python plot_concept_frequency.py
+
+# Step 3: Run zero-shot image-concept matching evaluation
+python plot_zeroshot.py
+```
+
 
 ## Acknowledgements
 

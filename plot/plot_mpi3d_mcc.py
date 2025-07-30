@@ -17,7 +17,7 @@ pdf_cmap    = LinearSegmentedColormap.from_list("pdf_theme", pdf_colors)
 # -----------------------------------------------------------------------------
 # Define mode: "selection" or "perturbation"
 # -----------------------------------------------------------------------------
-mode = "selection"  # Change to "selection" if needed
+mode = "perturbation"  # Change to "selection" if needed
 
 # -----------------------------------------------------------------------------
 # Define root directory
@@ -166,7 +166,7 @@ for matrix, labels, title in heatmap_data:
         matrix,
         annot=labels,
         fmt="",
-        cmap=pdf_cmap,      # apply PDF-inspired colormap
+        cmap="Blues",      # apply PDF-inspired colormap
         vmin=None,
         vmax=None,
         cbar=False,

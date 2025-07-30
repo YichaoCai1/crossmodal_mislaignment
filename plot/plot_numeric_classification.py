@@ -25,7 +25,7 @@ shift_color = "#e0e0e0"     # darker gray for inv. span
 # Define mode and directory
 # -----------------------------------------------------------------------------
 mode    = "perturb"    # drop or "perturb"
-setting = "ind"     # dep or "ind"
+setting = "dep"     # dep or "ind"
 base_dir = os.path.join("../models/Numeric/", f"{setting}_{mode}")
 
 # -----------------------------------------------------------------------------
@@ -79,11 +79,11 @@ if mode == "drop":
     plt.axvspan(1.5, 9.5,  color=inv_color,   alpha=0.5, label="_nolegend_")
     plt.axvspan(-0.5, 1.5, color=shift_color, alpha=0.5, label="_nolegend_")
     plt.axvline(4.5, color=palette[2], linestyle="--", alpha=0.6)
-    plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta},\ \mathrm{\mathbb{I}}_{\rho}=\emptyset$", fontsize=20)
+    plt.xlabel(r"selection bias, $\hat{\mathbf{z}}_x$", fontsize=20)
 else:
     plt.axvspan(-0.5, 7.5, color=inv_color,   alpha=0.5, label="_nolegend_")
     plt.axvspan(7.5, 9.5,  color=shift_color, alpha=0.5, label="_nolegend_")
-    plt.xlabel(r"$\mathrm{\mathbb{I}}_{\rho},\ \mathrm{\mathbb{I}}_{\theta}=\mathrm{\mathbb{I}}_{\mathbf{s}}$", fontsize=20)
+    plt.xlabel(r"perturbation bias, $\hat{\mathbf{z}}_x$", fontsize=20)
 
 # Plot ID line & fill
 ln1, = plt.plot(

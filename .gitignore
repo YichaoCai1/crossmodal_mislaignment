@@ -143,3 +143,8 @@ old_bashes/
 lsf.o*
 tags
 logs/
+clip_probing/flickr_images/
+clip_probing/plot_figures/
+clip_probing/crawl_image.py
+*.csv
+laion400m-metadata

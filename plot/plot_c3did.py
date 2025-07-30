@@ -14,7 +14,7 @@ pdf_cmap    = LinearSegmentedColormap.from_list("pdf_theme", pdf_colors)
 # -----------------------------------------------------------------------------
 # Define the base directory where the results are stored
 # -----------------------------------------------------------------------------
-mode     = "perturbations"     # perturbations, selections
+mode     = "selections"     # perturbations, selections
 base_dir = f"../models/C3DID/{mode}"
 
 # Get a list of all folders
@@ -95,7 +95,7 @@ df_nonlinear_text  = (df_grouped[df_grouped["modality"]=="text"]
 # -----------------------------------------------------------------------------
 # Plotting function (default cmap is now pdf_cmap)
 # -----------------------------------------------------------------------------
-def plot_heatmap(data, title, save_path, cmap=pdf_cmap):
+def plot_heatmap(data, title, save_path, cmap="Blues"):
     plt.figure(figsize=(10, 5))
     ax = sns.heatmap(
         data,

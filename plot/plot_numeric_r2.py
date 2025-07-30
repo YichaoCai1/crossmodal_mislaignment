@@ -124,7 +124,7 @@ for matrix, labels, title in heatmap_data:
         matrix,
         annot=labels,
         fmt="",
-        cmap=pdf_cmap,                # use PDF-inspired colormap
+        cmap="Blues",                # use PDF-inspired colormap
         cbar=False,
         norm=mcolors.Normalize(vmin=0, vmax=1),
         annot_kws={"fontsize": 17}
@@ -133,17 +133,17 @@ for matrix, labels, title in heatmap_data:
     # Set axis labels
     if mode == "perturb":
         if "image" in title:
-            plt.xlabel(r"$\mathrm{\mathbb{I}}_{\rho},\ \mathrm{\mathbb{I}}_{\theta}=\mathrm{\mathbb{I}}_{\mathbf{s}},\ \hat{\mathbf{z}}_x$", fontsize=23)
+            plt.xlabel(r"perturbation bias, $\hat{\mathbf{z}}_x$", fontsize=23)
         else:
-            plt.xlabel(r"$\mathrm{\mathbb{I}}_{\rho},\ \mathrm{\mathbb{I}}_{\theta}=\mathrm{\mathbb{I}}_{\mathbf{s}},\ \hat{\mathbf{z}}_t$", fontsize=23)
+            plt.xlabel(r"perturbation bias, $\hat{\mathbf{z}}_t$", fontsize=23)
         plt.xticks(ticks=np.arange(10) + 0.5, labels=reversed([r"${[9]}$", r"${[8]}$", r"${[7]}$", r"${[6]}$",
                                                                     r"${[5]}$", r"${[4]}$", r"${[3]}$", r"${[2]}$",
                                                                     r"${\{1\}}$", r"${\emptyset}$"]), fontsize=20, rotation=0)
     else:
         if "image" in title:
-            plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta},\ \ \ \ \mathrm{\mathbb{I}}_{\rho}=\emptyset,\ \hat{\mathbf{z}}_x$", fontsize=23)
+            plt.xlabel(r"selection bias, $\hat{\mathbf{z}}_x$", fontsize=23)
         else:
-            plt.xlabel(r"$\mathrm{\mathbb{I}}_{\theta},\ \ \ \ \mathrm{\mathbb{I}}_{\rho}=\emptyset,\ \hat{\mathbf{z}}_t$", fontsize=23)
+            plt.xlabel(r"selection bias, $\hat{\mathbf{z}}_t$", fontsize=23)
         plt.xticks(ticks=np.arange(10) + 0.5, labels=[r"${[10]}$", r"${[9]}$", r"${[8]}$", r"${[7]}$",
                                             r"${[6]}$", r"${[5]}$", r"${[4]}$", r"${[3]}$",
                                             r"${[2]}$", r"${{1}}$"], fontsize=20, rotation=0)

@@ -10,7 +10,7 @@ import seaborn as sns
 # -----------------------------------------------------------------------------
 # Style setup
 # -----------------------------------------------------------------------------
-plt.style.use('fast')
+plt.style.use("seaborn-v0_8-paper")
 plt.rc("font", family="DejaVu Sans")
 plt.rcParams["axes.xmargin"] = 0
 
@@ -22,7 +22,7 @@ inv_color  = "#ffffff"
 # Load & prepare data
 # -----------------------------------------------------------------------------
 mode     = "drop"   # drop or "perturb"
-stats    = "dep"    # dep or "ind"
+stats    = "ind"    # dep or "ind"
 root_path = f"../models/Numeric/{stats}_{mode}/"
 file_paths = glob.glob(os.path.join(root_path, f"{stats}_{mode}*_tr*/results_predict.csv"))
 
@@ -118,9 +118,9 @@ if data_frames:
 
     # axes labels & ticks
     xlabel = (
-        r"$\mathrm{\mathbb{I}}_{\theta},\ \mathrm{\mathbb{I}}_{\rho}=\emptyset$"
+        r"selection bias, $\hat{\mathbf{z}}_x$"
         if mode == "drop"
-        else r"$\mathrm{\mathbb{I}}_{\rho},\ \mathrm{\mathbb{I}}_{\theta}=\mathrm{\mathbb{I}}_{\mathbf{s}}$"
+        else r"perturbation bias, $\hat{\mathbf{z}}_x$"
     )
     plt.xlabel(xlabel, fontsize=20)
 
